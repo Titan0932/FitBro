@@ -31,9 +31,9 @@ insert into admins(adminID) values(5);
 insert into users(email, f_name, l_name, user_name, user_passw, user_dob) values('ravisKumar@test.com', 'Ravis', 'Kumar', 'ravisKumar', 'password4', '1994-01-01');
 insert into Admins(adminID) values(6);
 
-insert into rooms(name, status) values('Room 1');
-insert into rooms(name, status) values('Room 2');
-insert into rooms(name, status) values('Room 3');
+insert into rooms(name) values('Room 1');
+insert into rooms(name) values('Room 2');
+insert into rooms(name) values('Room 3');
 
 insert into schedules(roomID, classID, date ,start_time, duration) values(3, 1, '2024-04-11' ,'08:00:00', 2);
 insert into schedules(roomID, classID, date ,start_time, duration) values(3, 1, '2024-04-11' ,'10:00:00', 2);
@@ -56,10 +56,10 @@ insert into member_schedule(memberID, scheduleID) values(1, 2);
 insert into member_schedule(memberID, scheduleID) values(2, 2);
 insert into member_schedule(memberID, scheduleID) values(2, 4);
 
-insert into invoice(memberID, amount, date, scheduleID, status) values(1, 20, '2024-04-09', 1, 'paid');
-insert into invoice(memberID, amount, date, scheduleID, status) values(1, 20, '2024-04-09', 2, 'paid');
-insert into invoice(memberID, amount, date, scheduleID, status) values(2, 20, '2024-04-09', 2, 'paid');
-insert into invoice(memberID, amount, date, scheduleID, status) values(2, 50, '2024-04-09', 4, 'paid');
+insert into invoices(memberID, amount, date, scheduleID, status) values(1, 20, '2024-04-09', 1, 'paid');
+insert into invoices(memberID, amount, date, scheduleID, status) values(1, 20, '2024-04-09', 2, 'paid');
+insert into invoices(memberID, amount, date, scheduleID, status) values(2, 20, '2024-04-09', 2, 'paid');
+insert into invoices(memberID, amount, date, scheduleID, status) values(2, 50, '2024-04-09', 4, 'paid');
 
 
 
