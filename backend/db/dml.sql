@@ -1,16 +1,16 @@
 
 
-Insert into users(email, f_name, l_name, user_name, user_passw, user_dob) values('johndoe@test.com','John','Doe','johndoe','password','1990-01-01');
+Insert into users(email, f_name, l_name, user_name, user_passw, user_dob) values('johndoe@test.com','John','Doe','johndoe','$2b$10$A63RoL1ZRrV7lPuJkrCW5Oef5Ta8umet0tuO4Gux1YbI47xcRXdd2','1990-01-01'); /* password */
 Insert into members(memberID, health_metrics) values(1, 'weight: 79, height: 6ft');
 Insert into fitness_goals(memberID, goal_type, goal_value) values(1, 'weight', '70');
 
-Insert into users(email, f_name, l_name, user_name, user_passw, user_dob) values('sarahFowler@test.com', 'Sarah', 'Fowler', 'sarahFowler', 'password1', '1991-01-01');
+Insert into users(email, f_name, l_name, user_name, user_passw, user_dob) values('sarahFowler@test.com', 'Sarah', 'Fowler', 'sarahFowler', '$2b$10$MRFdzIjjxc2k8aesAeLgOuWjaQMeDXLnU56OHx0P15QXzurz.51va', '1991-01-01'); /* password1 */
 Insert into members(memberID, health_metrics) values(2, 'weight: 59, height: 5.6ft');
 
-Insert into users(email, f_name, l_name, user_name, user_passw, user_dob) values('jasonThompson@test.com', 'Jason', 'Thompson', 'jasonThompson', 'password2', '1992-01-01');
+Insert into users(email, f_name, l_name, user_name, user_passw, user_dob) values('jasonThompson@test.com', 'Jason', 'Thompson', 'jasonThompson', '$2b$10$dnwJE2pwLpKLSzTUgZpHoOLCrE10tSNwWjztLSFrur.UM7qhFE8Rm', '1992-01-01');/* password2 */
 insert into trainers(trainerID, speciality) values(3, ARRAY['yoga', 'pilates']);
 
-Insert into users(email, f_name, l_name, user_name, user_passw, user_dob) values('amyShwartz@test.com', 'Amy', 'Shwarts', 'amyShwarts', 'password3', '1993-01-01');
+Insert into users(email, f_name, l_name, user_name, user_passw, user_dob) values('amyShwartz@test.com', 'Amy', 'Shwarts', 'amyShwarts', '$2b$10$Zan3FhRSDYOezP2PaLloYOxoYKiBSIlk8S9jkpUfXuYU1XRAk9YDu', '1993-01-01');/* password3 */
 insert into trainers(trainerID, speciality) values(4, ARRAY['yoga', 'lifting']);
 
 insert into trainer_availability(trainerID, day_of_week, start_time, end_time) values(3, 1 ,'08:00:00', '14:00:00');
