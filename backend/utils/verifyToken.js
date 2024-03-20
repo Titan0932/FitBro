@@ -5,6 +5,6 @@ export const verifyToken = (authHeader) => {
   
     if (token == null) return (401, "")
     jwt.verify(token, SECRET_KEY, (err, user) => {
-        return (err, user)
+        return {err, user}
     });
 }
