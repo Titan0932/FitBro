@@ -1,6 +1,6 @@
 
 
-export const verifyToken = (authHeader) => {
+const verifyToken = (authHeader) => {
     const token = authHeader && authHeader.split(' ')[1];
   
     if (token == null) return (401, "")
@@ -8,3 +8,4 @@ export const verifyToken = (authHeader) => {
         return {err, user}
     });
 }
+module.exports = verifyToken

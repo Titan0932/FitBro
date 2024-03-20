@@ -2,14 +2,28 @@ const bcrypt = require('bcrypt');
 
 const saltRounds = 10;
 
-export const getPwHash = (password) => {
-    bcrypt.hash(password, saltRounds, function(err, hash) {
-        return {err, hash}
-    });
-}
+const getPwHash = (password) => {
+    return new Promise((resolve, reject) => {
+      bcrypt.hash(password, saltRounds, function(err, hash) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(err, hash);
+        }
+      });
+    }
+)}
 
-export const checkPwHash = (password, hash) => {
-    bcrypt.compare(password, hash, function(err, result) {
-        return {err, result}
+const checkPwHash = (password, hash) => {
+    return new Promise((resolve, reject) => {
+      bcrypt.compare(password, hash, function(err, result) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({err, result});
+        }
+      });
     });
-}
+  }
+
+module.exports = {getPwHash, checkPwHash}
