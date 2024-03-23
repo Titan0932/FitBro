@@ -7,7 +7,6 @@ const users = pgTable('users', {
   email: text('email').notNull(),
   f_name: text('f_name').notNull(),
   l_name: text('l_name').notNull(),
-  user_name: text('user_name').notNull(),
   user_passw: text('user_passw').notNull(),
   user_dob: date('user_dob'),
 });
