@@ -5,7 +5,6 @@ CREATE TABLE users(
     email TEXT NOT NULL UNIQUE,
     f_name TEXT NOT NULL,
     l_name TEXT NOT NULL,
-    user_name TEXT NOT NULL UNIQUE,
     user_passw TEXT NOT NULL,
     user_dob DATE
 );
