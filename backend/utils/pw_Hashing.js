@@ -4,11 +4,11 @@ const saltRounds = 10;
 
 const getPwHash = (password) => {
     return new Promise((resolve, reject) => {
-      bcrypt.hash(password, saltRounds, function(err, hash) {
-        if (err) {
-          reject(err);
+      bcrypt.hash(password, saltRounds, function(getHasherr, hashedPw) {
+        if (getHasherr) {
+          return reject({getHasherr, hashedPw: ""});
         } else {
-          resolve(err, hash);
+          return resolve({getHasherr: "", hashedPw});
         }
       });
     }
