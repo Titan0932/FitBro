@@ -1,18 +1,26 @@
-const checkPwHash = require("./utils/pw_Hashing").checkPwHash;
-const {users, members, fitness_goals, trainers, trainer_availability, admins, classes, rooms, equipments} = require("./db/schema");
+const checkPwHash = require("./pw_Hashing").checkPwHash;
+const {users, members, fitness_goals, trainers, trainer_availability, admins, classes, rooms, equipments} = require("../db/schema");
 const {eq} = require("drizzle-orm");
 
 require("dotenv").config();
 const SECRET_KEY = process.env.JWT_SECRET;
 
-const db = require("./dbConnect");
+const db = require("../dbConnect");
+const jwt = require("jsonwebtoken");
 
 
+/**
+ * Authenticates a user based on their email and password.
+ *
+ * @param {string} email - The email of the user.
+ * @param {string} user_passw - The password of the user.
+ * @returns {Promise<{userAuthError: Object, userInfo: Object}>} - A promise that resolves to an object containing the user authentication error and user information.
+ */
 async function authenticateUser(email, user_passw) {
     // code to authenticate user
     userAuthError = {}; //status: 401, message: "..."
     userInfo = {};
-    db.select().from(users).where(eq(users.email, email))
+    await db.select().from(users).where(eq(users.email, email))
     .then(async (data) => {
       if (data.length > 0) {
         userInfo = data[0];
@@ -35,6 +43,12 @@ async function authenticateUser(email, user_passw) {
     return {userAuthError, userInfo};
 }
   
+/**
+ * Checks the role of a user and fetches additional data based on the role.
+ * @param {string} role - The role to check (e.g., "member", "trainer", "admin").
+ * @param {object} userInfo - The user information object.
+ * @returns {Promise<{userRoleErr: object, additionalData: object}>} - A promise that resolves to an object containing the user role error and additional data.
+ */
 async function checkUserRole(role, userInfo) {
     // code to check user's role and fetch additional data
     additionalData = {};
@@ -84,6 +98,13 @@ async function checkUserRole(role, userInfo) {
   
 }
   
+/**
+ * Generates a JWT token for the given email and role.
+ *
+ * @param {string} email - The email of the user.
+ * @param {string} role - The role of the user.
+ * @returns {string} - The generated JWT token.
+ */
 function generateJwtToken(email, role) {
     // code to generate JWT token
     const jwtToken = jwt.sign({ email, role }, SECRET_KEY, {
@@ -92,7 +113,44 @@ function generateJwtToken(email, role) {
     return jwtToken;
 }
 
-/* Verify if a user of a specific email exists */
+
+/**
+ * Verifies the authenticity of a token.
+ * @param {string} authHeader - The authorization header containing the token.
+ * @returns {Promise<{tokenErr: Error, user: Object}>} A promise that resolves with an object containing the token error (if any) and the user object.
+ * @throws {Error} If the token is missing or invalid.
+ */
+const verifyToken = (authHeader) => {
+  tokenErr = {};
+  user = {};
+  return new Promise((resolve, reject) => {
+      const token = authHeader && authHeader.split(' ')[1];
+      console.log(token)
+      if (token == null) {
+        tokenErr = {status: 401, message: "Token is missing"};
+        return reject(tokenErr, user);
+      }
+      jwt.verify(token, SECRET_KEY, (err, user) => {
+          if (err) {
+              tokenErr = {status: 403, message: err.message};
+              return reject({tokenErr, user: {}});
+          } else {
+              return resolve({tokenErr, user});
+          }
+      });
+  })
+  .catch((err) => {
+      console.log("ERROR123!!!: " , err)
+      tokenErr = {status: 500, message: err};
+      return ({tokenErr, user: {}});
+  });
+}
+
+/**
+ * Checks if a user with the given email exists in the database.
+ * @param {string} email - The email to check.
+ * @returns {Promise<{checkErr: Object, check: boolean}>} - A promise that resolves to an object containing the check error and the check result.
+ */
 async function checkUserEmailExists(email){
   checkErr = {};
   check = false;
@@ -110,7 +168,13 @@ async function checkUserEmailExists(email){
   return {checkErr, check};
 }
 
-/* Verify if a user of a specific email + role exists */
+/**
+ * Checks if a user with the specified email and role exists.
+ *
+ * @param {string} email - The email of the user to check.
+ * @param {string} role - The role of the user to check.
+ * @returns {Promise<{userCheckError: Object, userExists: boolean}>} - A promise that resolves to an object containing the user check error and a boolean indicating if the user exists.
+ */
 async function checkUserEmailRoleExists(email, role) {
   let userExists = false;
   let userCheckError = {};
@@ -141,5 +205,6 @@ module.exports = {
     checkUserRole,
     generateJwtToken,
     checkUserEmailExists,
-    checkUserEmailRoleExists
+    checkUserEmailRoleExists,
+    verifyToken
   };
