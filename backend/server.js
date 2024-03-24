@@ -28,6 +28,8 @@ const {
   classes,
   rooms,
   equipments,
+  exercises,
+  member_exercises,
 } = require("./db/schema");
 
 const e = require("express");

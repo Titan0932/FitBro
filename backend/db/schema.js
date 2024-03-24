@@ -96,7 +96,7 @@ const fitness_goals = pgTable('fitness_goals', {
   });
 
   
-const excercises = pgTable('exercises', {
+const exercises = pgTable('exercises', {
     exerciseid: serial('exerciseid').primaryKey(),
     name: text('name').notNull(),
     description: text('description'),
@@ -125,7 +125,7 @@ const member_exercises = pgTable('member_exercises', {
     member_schedule,
     trainer_schedule,
     invoices,
-    excercises,
+    exercises,
     member_exercises
   };
 
