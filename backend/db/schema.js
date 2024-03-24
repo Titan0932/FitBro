@@ -18,9 +18,15 @@ const members = pgTable('members', {
 
 
 const fitness_goals = pgTable('fitness_goals', {
+    goalid: serial('goalid').primaryKey(),
     memberid: integer('memberid').primaryKey().references(members.memberid),
-    goal_type: text('goal_type'),
+    goal_title: text('goal_title'),
+    goal_description: text('goal_description'),
     goal_value: text('goal_value'),
+    goal_start: date('goal_start'),
+    target_date: date('target_date'),
+    achieved_date: date('achieved_date'),
+    status: text('status'),
   });
   
   const trainers = pgTable('trainers', {
@@ -31,7 +37,7 @@ const fitness_goals = pgTable('fitness_goals', {
   const trainer_availability = pgTable('trainer_availability', {
     availabilityid: serial('availabilityid').primaryKey(),
     trainerid: integer('trainerid').references(trainers.trainerid),
-    day_of_week: integer('day_of_week'),
+    date: integer('date'),
     start_time: time('start_time'),
     end_time: time('end_time'),
   });
@@ -89,6 +95,22 @@ const fitness_goals = pgTable('fitness_goals', {
     status: text('status').notNull(),
   });
 
+  
+const excercises = pgTable('exercises', {
+    exerciseid: serial('exerciseid').primaryKey(),
+    name: text('name').notNull(),
+    description: text('description'),
+    type: text('type'),
+})
+
+const member_exercises = pgTable('member_exercises', {
+    memberid: integer('memberid').primaryKey().references(members.memberid),
+    exerciseid: integer('exerciseid').primaryKey().references(exercises.exerciseid),
+    reps: integer('reps'),
+    weight: decimal('weight'),
+    start_week: date('start_week').primaryKey(),
+})
+
   module.exports = {
     users,
     members,
@@ -103,5 +125,7 @@ const fitness_goals = pgTable('fitness_goals', {
     member_schedule,
     trainer_schedule,
     invoices,
+    excercises,
+    member_exercises
   };
 

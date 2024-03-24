@@ -15,10 +15,16 @@ CREATE TABLE members(
 );
 
 CREATE TABLE fitness_goals(
+    goalID SERIAL,
     memberID INTEGER REFERENCES members(memberID),
-    goal_type TEXT,
+    goal_title TEXT NOT NULL,
+    goal_description TEXT,
     goal_value TEXT,
-    PRIMARY KEY (memberID)
+    goal_start DATE,
+    target_date DATE,
+    achieved_date DATE,
+    status TEXT NOT NULL,
+    PRIMARY KEY (goalID, memberID)
 );
 
 CREATE TABLE trainers(
@@ -29,7 +35,7 @@ CREATE TABLE trainers(
 CREATE TABLE trainer_availability (
     availabilityId SERIAL PRIMARY KEY,
     trainerID INTEGER REFERENCES trainers(trainerID),
-    day_of_week INTEGER, -- 1 (Monday) to 7 (Sunday)
+    date DATE, -- specific date of availability
     start_time TIME,
     end_time TIME
 );
@@ -87,5 +93,22 @@ CREATE TABLE invoices(
     date DATE NOT NULL,
     scheduleID INTEGER REFERENCES schedules(scheduleID),
     status TEXT NOT NULL
+);
+
+
+CREATE TABLE exercises(
+    exerciseid SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    type TEXT
+);
+
+CREATE TABLE member_exercises (
+    memberID INTEGER REFERENCES members(memberID),
+    exerciseID INTEGER REFERENCES exercises(exerciseID),
+    reps INTEGER,
+    weight DECIMAL,
+    start_week Date, -- week starting date
+    PRIMARY KEY (memberID, exerciseID, start_week)
 );
 

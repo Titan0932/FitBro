@@ -2,7 +2,7 @@
 
 Insert into users(email, f_name, l_name, user_passw, user_dob) values('johndoe@test.com','John','Doe','j$2b$10$A63RoL1ZRrV7lPuJkrCW5Oef5Ta8umet0tuO4Gux1YbI47xcRXdd2','1990-01-01'); /* password */
 Insert into members(memberID, health_metrics) values(1, 'weight: 79, height: 6ft');
-Insert into fitness_goals(memberID, goal_type, goal_value) values(1, 'weight', '70');
+Insert into fitness_goals(memberID, goal_title, goal_value, target_date, status) values(1, 'Weight Loss', '65', '2024-12-31', 'to-do');
 
 Insert into users(email, f_name, l_name, user_passw, user_dob) values('sarahFowler@test.com', 'Sarah', 'Fowler', '$2b$10$MRFdzIjjxc2k8aesAeLgOuWjaQMeDXLnU56OHx0P15QXzurz.51va', '1991-01-01'); /* password1 */
 Insert into members(memberID, health_metrics) values(2, 'weight: 59, height: 5.6ft');
@@ -13,14 +13,14 @@ insert into trainers(trainerID, speciality) values(3, ARRAY['yoga', 'pilates']);
 Insert into users(email, f_name, l_name, user_passw, user_dob) values('amyShwartz@test.com', 'Amy', 'Shwarts', '$2b$10$Zan3FhRSDYOezP2PaLloYOxoYKiBSIlk8S9jkpUfXuYU1XRAk9YDu', '1993-01-01');/* password3 */
 insert into trainers(trainerID, speciality) values(4, ARRAY['yoga', 'lifting']);
 
-insert into trainer_availability(trainerID, day_of_week, start_time, end_time) values(3, 1 ,'08:00:00', '14:00:00');
-insert into trainer_availability(trainerID, day_of_week, start_time, end_time) values(3, 2 ,'08:00:00', '15:00:00');
-insert into trainer_availability(trainerID, day_of_week, start_time, end_time) values(3, 3 ,'08:00:00', '14:00:00');
-insert into trainer_availability(trainerID, day_of_week, start_time, end_time) values(3, 4 ,'08:00:00', '13:00:00');
-insert into trainer_availability(trainerID, day_of_week, start_time, end_time) values(3, 5 ,'08:00:00', '17:00:00');
+insert into trainer_availability(trainerID, date, start_time, end_time) values(3, '2024-04-21' ,'08:00:00', '14:00:00');
+insert into trainer_availability(trainerID, date, start_time, end_time) values(3, '2024-04-22' ,'08:00:00', '15:00:00');
+insert into trainer_availability(trainerID, date, start_time, end_time) values(3, '2024-04-23' ,'08:00:00', '14:00:00');
+insert into trainer_availability(trainerID, date, start_time, end_time) values(3, '2024-04-24' ,'08:00:00', '13:00:00');
+insert into trainer_availability(trainerID, date, start_time, end_time) values(3, '2024-04-25' ,'08:00:00', '17:00:00');
 
-insert into trainer_availability(trainerID, day_of_week, start_time, end_time) values(4, 6 ,'08:00:00', '17:00:00');
-insert into trainer_availability(trainerID, day_of_week, start_time, end_time) values(4, 7 ,'08:00:00', '16:00:00');
+insert into trainer_availability(trainerID, date, start_time, end_time) values(4, '2024-04-21' ,'08:00:00', '17:00:00');
+insert into trainer_availability(trainerID, date, start_time, end_time) values(4, '2024-04-22' ,'08:00:00', '16:00:00');
 
 insert into classes(name, description, type, trainerID, price) values('Yoga', 'Yoga for beginners', 'group', 3, 20);
 insert into classes(name, description, type, trainerID, price) values('Personal Training', 'Pilates Training', 'personal', 4, 50);
