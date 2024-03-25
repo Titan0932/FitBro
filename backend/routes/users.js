@@ -3,14 +3,13 @@ const router = express.Router();
 
 const { eq } = require("drizzle-orm");
 
-const express = require("express");
-
 const {
     authenticateUser,
     checkUserRole,
     generateJwtToken,
     checkUserEmailRoleExists,
     checkUserEmailExists,
+    authMiddleware
   } = require("../utils/auth");
 
 const {users} = require("../db/schema");
@@ -21,7 +20,7 @@ const { insertUserIntoRoleTable } = require('../db/userOperations');
 
 router.post("/login", async (req, res) => {
     // console.log(req)
-    const { email, user_passw, role="Member" } = req.query;
+    const { email, user_passw, role="member" } = req.query;
   
     const { userAuthError, userInfo } = await authenticateUser(email, user_passw);
     console.log("AUTH: ", userAuthError)
@@ -102,7 +101,7 @@ return res.status(200).send("User registered successfully");
 });
 
 
-router.get("/getUserInfo", async (req, res) => {
+router.get("/getUserInfo", authMiddleware ,async (req, res) => {
 const { email } = req.query;
 const { user } = req.user;
 
@@ -125,7 +124,7 @@ const result = await db
 });
 
 
-router.put("/updateUserInfo", async (req, res) => {
+router.put("/updateUserInfo", authMiddleware, async (req, res) => {
 const { email, f_name, l_name, user_passw, user_dob, new_passw } = req.query;
 const { user } = req.user;
 if(user.email != email){

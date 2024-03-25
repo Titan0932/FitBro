@@ -1,13 +1,9 @@
 require("dotenv").config();
 
-const { eq, or, asc } = require("drizzle-orm");
-
 const express = require("express");
 
 const app = express();
 const port = 3005;
-
-const {verifyToken} = require("./utils/auth");
 
 const userRoutes = require('./routes/users');
 const classRoutes = require('./routes/classes');
@@ -16,29 +12,20 @@ const memberRoutes = require('./routes/members');
 const trainerRoutes = require('./routes/trainers');
 const adminRoutes = require('./routes/admin');
 
-// Middleware for checking authorization
-app.use(async (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
-  req.user = user;
-  next();
-});
+const {authMiddleware} = require("./utils/auth");
 
 
 app.use('/users', userRoutes);
 
-app.use('/classes', classRoutes);
+app.use('/classes', authMiddleware, classRoutes);
 
-app.use('/schedules', scheduleRoutes);
+app.use('/schedules', authMiddleware, scheduleRoutes);
 
-app.use('/members', memberRoutes);
+app.use('/members', authMiddleware, memberRoutes);
 
-app.use('/trainers', trainerRoutes);
+app.use('/trainers', authMiddleware, trainerRoutes);
 
-app.use('/admin', adminRoutes);
+app.use('/admin', authMiddleware, adminRoutes);
 
 app.use((req, res) => {
   res.status(404).send({ message: 'Route not found' });
