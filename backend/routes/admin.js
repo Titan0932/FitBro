@@ -3,14 +3,12 @@ const router = express.Router();
 
 const { eq } = require("drizzle-orm");
 
-const express = require("express");
-
-const db = require("./dbConnect");
+const db = require("../dbConnect");
 const {
   rooms,
   equipments,
   invoices,
-} = require("./db/schema");
+} = require("../db/schema");
 
 // get all rooms
 router.get("/getAllRooms", async (req, res) => {

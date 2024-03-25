@@ -3,14 +3,12 @@ const router = express.Router();
 
 const { eq } = require("drizzle-orm");
 
-const express = require("express");
-
-const db = require("./dbConnect");
+const db = require("../dbConnect");
 const {
   users,
   trainers,
   trainer_availability,
-} = require("./db/schema");
+} = require("../db/schema");
 
 // to get all trainers 
 router.get("/getAllTrainers", async (req, res) => {
