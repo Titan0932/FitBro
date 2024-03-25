@@ -38,6 +38,17 @@ const {
 const e = require("express");
 const getPwHash = require("./utils/pw_Hashing").getPwHash;
 
+// Middleware for checking authorization
+app.use(async (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const { tokenErr, user } = await verifyToken(authHeader);
+  if (tokenErr?.status) {
+    return res.status(tokenErr.status).send(tokenErr.message);
+  }
+  req.user = user;
+  next();
+});
+
 app.post("/login", async (req, res) => {
   // console.log(req)
   const { email, user_passw, role="Member" } = req.query;
@@ -121,14 +132,9 @@ app.post("/register", async (req, res) => {
 
 
 app.get("/getUserInfo", async (req, res) => {
-  const authHeader = req.headers["authorization"];
   const { email } = req.query;
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  } else if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
+  const { user } = req.user;
+  
   if(user.email != email){
     res.status(401).send("Unauthorized access");
     return;
@@ -148,14 +154,8 @@ app.get("/getUserInfo", async (req, res) => {
 });
 
 app.post("/updateUserInfo", async (req, res) => {
-  const authHeader = req.headers["authorization"];
   const { email, f_name, l_name, user_passw, user_dob, new_passw } = req.query;
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  } else if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
+  const { user } = req.user;
   if(user.email != email){
     res.status(401).send("Unauthorized access");
     return;
@@ -202,13 +202,7 @@ app.post("/updateUserInfo", async (req, res) => {
 
 // to get all group classes
 app.get("/getAllGroupClasses", async (req, res) => {
-  const authHeader = req.headers["authorization"];
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  } else if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
+  const { user } = req.user;
 
   const result = await db
     .select({
@@ -233,15 +227,10 @@ app.get("/getAllGroupClasses", async (req, res) => {
 
 // to get the schedule of a class in ascending order of date and time
 app.get("/getClassSchedule", async (req, res) => {
- const authHeader = req.headers["authorization"];
  const { classid } = req.query;
 
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  } else if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
+  const { user } = req.user;
+
   const result = await db
     .select({
       scheduleid: schedules.scheduleid,
@@ -272,15 +261,10 @@ app.get("/getClassSchedule", async (req, res) => {
 
 //get member schedule
 app.get("/getMemberSchedule", async (req, res) => {
-  const authHeader = req.headers["authorization"];
   const { memberid } = req.query;
 
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  } else if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
+  const { user } = req.user;
+  
   const result = await db
     .select({
       scheduleid: schedules.scheduleid,
@@ -312,14 +296,8 @@ app.get("/getMemberSchedule", async (req, res) => {
 
 // to get all trainers 
 app.get("/getAllTrainers", async (req, res) => {
-  const authHeader = req.headers["authorization"];
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  } else if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
-
+  const { user } = req.user;
+  
   const result = await db
     .select({
       trainerid: trainers.trainerid,
@@ -344,17 +322,11 @@ app.get("/getAllTrainers", async (req, res) => {
 
 // to get user's incomplete fitness goals
 app.get("/getFitnessGoals/:status", async (req, res) => {
-  const authHeader = req.headers["authorization"];
   const { memberid } = req.query;
   const { status } = req.params;
 
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  } else if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
-
+  const { user } = req.user;
+  
   if(user.userid != memberid){
     res.status(401).send("Unauthorized access");
     return;
@@ -388,15 +360,9 @@ app.get("/getFitnessGoals/:status", async (req, res) => {
 
 // get member's health metrics
 app.get("/getHealthMetrics", async (req, res) => {
-  const authHeader = req.headers["authorization"];
   const { memberid } = req.query;
 
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  } else if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
+  const { user } = req.user;
 
   if(user.userid != memberid){
     res.status(401).send("Unauthorized access");
@@ -418,16 +384,9 @@ app.get("/getHealthMetrics", async (req, res) => {
 })
 
 app.get("/getWeeklyRoutines", async (req, res) => {
-  const authHeader = req.headers["authorization"];
   const { memberid } = req.query;
-
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  } else if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
-
+  const { user } = req.user;
+  
   if(user.userid != memberid){
     res.status(401).send("Unauthorized access");
     return;
@@ -452,15 +411,9 @@ app.get("/getWeeklyRoutines", async (req, res) => {
 
 // select an exercise for the specific weekly routine
 app.post("/selectExercise", async (req, res) => {
-  const authHeader = req.headers["authorization"];
   const { memberid, exerciseid, week_date, rep, weight } = req.query;
 
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  } else if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
+  const { user } = req.user;
 
   if(user.userid != memberid){
     res.status(401).send("Unauthorized access");
@@ -488,15 +441,9 @@ app.post("/selectExercise", async (req, res) => {
 
 //pay a bill
 app.post("/payBill", async (req, res) => {
-  const authHeader = req.headers["authorization"];
   const { memberid, scheduleid, paidAmount } = req.query;
 
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  } else if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
+  const { user } = req.user;
   if(user.userid != memberid){
     res.status(401).send("Unauthorized access");
     return;
@@ -549,15 +496,9 @@ app.post("/payBill", async (req, res) => {
 
 // create a schedule: group for admins and personal for members
 app.post("/createSchedule/:type", async (req, res) => {
-  const authHeader = req.headers["authorization"];
   const { id, classid, roomid, date, start_time, duration, status="pending", trainerid } = req.query;
   const {type} = req.params;
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  } else if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
+  const { user } = req.user;
   // creating schedule for group class for admin
   if(type == "group" && user.role == "admin"){
     await db.insert(schedules)
@@ -645,39 +586,17 @@ app.post("/createSchedule/:type", async (req, res) => {
 })
 
 
-// book a group class 
-app.get("/bookPersonalTrainer", async (req, res) => {
-  const authHeader = req.headers["authorization"];
-  const { memberid, date, start_time, duration, classid, } = req.query;
-
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    if (user.userid != memberid) {
-      // Handle unauthorized access
-      return res.status(401).json({ error: "Unauthorized access" });
-    }
-  }
-  await db.select({scheduleid: schedules.scheduleid})
-          .from(schedules)
-          .where(and(eq(schedules.date, date), eq(schedules.start_time, start_time), eq(schedules.duration, duration), eq(schedules.classid, classid)))
-});
 
 
 
-// browse list of trainers and book a personal session from their available hours
+// get all trainers
 
 
 //trainer getters
 app.get("/getAllMembersByName", async (req, res) => {
-  const authHeader = req.headers["authorization"];
   // console.log(authHeader)
   const {user_fname, user_lname} = req.query;
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  } else if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
+  const { user } = req.user;
   if(user.role != "admin" || user.role != "trainer"){
     res.status(401).send("Unauthorized access");
     return;
@@ -716,14 +635,8 @@ app.get("/getAllMembersByName", async (req, res) => {
 
 // anyone can see the availability for a trainer
 app.get("/getTrainerAvailability", async (req, res) => {
-  const authHeader = req.headers["authorization"];
   const { trainerid } = req.query;
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  } else if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
+  const { user } = req.user;
   
   const result = await db
     .select({
@@ -746,15 +659,9 @@ app.get("/getTrainerAvailability", async (req, res) => {
 
 // get a trainer's schedule
 app.get("/getTrainerSchedule", async (req, res) => {
-  const authHeader = req.headers["authorization"];
   const { trainerid } = req.query;
 
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  } else if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
+  const { user } = req.user;
   if(user.userid != trainerid){
     res.status(401).send("Unauthorized access");
     return;
@@ -797,13 +704,7 @@ app.get("/getTrainerSchedule", async (req, res) => {
 
 // get all rooms
 app.get("/getAllRooms", async (req, res) => {
-  const authHeader = req.headers["authorization"];
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  } else if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
+  const { user } = req.user;
   if(user.role != "admin"){
     res.status(401).send("Unauthorized access");
     return;
@@ -822,14 +723,8 @@ app.get("/getAllRooms", async (req, res) => {
 })
 
 app.get("/getAllEquipments", async (req, res) => {
-  const authHeader = req.headers["authorization"];
   const { roomid } = req.query;
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  } else if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
+  const { user } = req.user;
   if(user.role != "admin"){
     res.status(401).send("Unauthorized access");
     return;
@@ -850,14 +745,8 @@ app.get("/getAllEquipments", async (req, res) => {
 
 // get all classes
 app.get("/getAllClasses", async (req, res) => {
-  const authHeader = req.headers["authorization"];
   // const { classid } = req.query;
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  } else if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
+  const { user } = req.user;
   if(user.role != "admin"){
     res.status(401).send("Unauthorized access");
     return;
@@ -878,14 +767,8 @@ app.get("/getAllClasses", async (req, res) => {
 
 // get all invoices
 app.get("/getAllInvoices", async (req, res) => {
-  const authHeader = req.headers["authorization"];
   const { memberid } = req.query;
-  const { tokenErr, user } = await verifyToken(authHeader);
-  if (tokenErr?.status == 401) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  } else if (tokenErr?.status) {
-    return res.status(tokenErr.status).send(tokenErr.message);
-  }
+  const { user } = req.user;
   if(user.role != "admin"){
     res.status(401).send("Unauthorized access");
     return;
@@ -906,8 +789,6 @@ app.get("/getAllInvoices", async (req, res) => {
 
 
 // TODO: Post requests for admin stuffs
-
-
 app.use((req, res) => {
   res.status(404).send({ message: 'Route not found' });
 });
