@@ -71,7 +71,8 @@ CREATE TABLE schedules(
     start_time TIME NOT NULL,
     duration INTEGER NOT NULL,
     classId INTEGER REFERENCES classes(classId),
-    roomID INTEGER REFERENCES rooms(roomID)
+    roomID INTEGER REFERENCES rooms(roomID),
+    status TEXT NOT NULL
 );
 
 CREATE TABLE member_schedule(
@@ -87,12 +88,13 @@ CREATE TABLE trainer_schedule(
 );
 
 CREATE TABLE invoices(
-    invoiceID SERIAL PRIMARY KEY,
+    invoiceID SERIAL UNIQUE,
     memberID INTEGER REFERENCES members(memberID),
     amount DECIMAL NOT NULL,
     date DATE NOT NULL,
     scheduleID INTEGER REFERENCES schedules(scheduleID),
-    status TEXT NOT NULL
+    status TEXT NOT NULL,
+    PRIMARY KEY (scheduleID, memberID)
 );
 
 

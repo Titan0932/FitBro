@@ -74,6 +74,7 @@ const fitness_goals = pgTable('fitness_goals', {
     duration: integer('duration').notNull(),
     classid: integer('classid').references(classes.classid),
     roomid: integer('roomid').references(rooms.roomid),
+    status: text('status').notNull(),
   });
   
   const member_schedule = pgTable('member_schedule', {
