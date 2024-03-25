@@ -9,6 +9,18 @@ const db = require("../dbConnect");
 const jwt = require("jsonwebtoken");
 
 
+
+// Middleware for checking authorization
+async function authMiddleware(req, res, next){
+  const authHeader = req.headers["authorization"];
+  const { tokenErr, user } = await verifyToken(authHeader);
+  if (tokenErr?.status) {
+    return res.status(tokenErr.status).send(tokenErr.message);
+  }
+  req.user = user;
+  next();
+};
+
 /**
  * Authenticates a user based on their email and password.
  *
@@ -206,5 +218,6 @@ module.exports = {
     generateJwtToken,
     checkUserEmailExists,
     checkUserEmailRoleExists,
-    verifyToken
+    verifyToken,
+    authMiddleware
   };
