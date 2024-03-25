@@ -30,6 +30,9 @@ const {
   equipments,
   exercises,
   member_exercises,
+  invoices,
+  member_schedule,
+  schedules
 } = require("./db/schema");
 
 const e = require("express");
@@ -267,7 +270,7 @@ app.get("/getClassSchedule", async (req, res) => {
     })
 })
 
-//get all member schedule
+//get member schedule
 app.get("/getMemberSchedule", async (req, res) => {
   const authHeader = req.headers["authorization"];
   const { memberid } = req.query;
@@ -446,6 +449,222 @@ app.get("/getWeeklyRoutines", async (req, res) => {
 })
 
 // TODO: Updating member stuffs: Post requests
+
+// select an exercise for the specific weekly routine
+app.post("/selectExercise", async (req, res) => {
+  const authHeader = req.headers["authorization"];
+  const { memberid, exerciseid, week_date, rep, weight } = req.query;
+
+  const { tokenErr, user } = await verifyToken(authHeader);
+  if (tokenErr?.status == 401) {
+    return res.status(tokenErr.status).send(tokenErr.message);
+  } else if (tokenErr?.status) {
+    return res.status(tokenErr.status).send(tokenErr.message);
+  }
+
+  if(user.userid != memberid){
+    res.status(401).send("Unauthorized access");
+    return;
+  }
+
+  const result = await db
+    .insert(member_exercises)
+    .values({
+      memberid: memberid,
+      exerciseid: exerciseid,
+      week_date: week_date,
+      reps: rep,
+      weight: weight,
+    })
+    .execute()
+    .then(() => {
+      res.status(200).send("Exercise added to weekly routine");
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("An error occurred while adding exercise to weekly routine");
+    });
+})
+
+//pay a bill
+app.post("/payBill", async (req, res) => {
+  const authHeader = req.headers["authorization"];
+  const { memberid, scheduleid, paidAmount } = req.query;
+
+  const { tokenErr, user } = await verifyToken(authHeader);
+  if (tokenErr?.status == 401) {
+    return res.status(tokenErr.status).send(tokenErr.message);
+  } else if (tokenErr?.status) {
+    return res.status(tokenErr.status).send(tokenErr.message);
+  }
+  if(user.userid != memberid){
+    res.status(401).send("Unauthorized access");
+    return;
+  }
+
+  await db.select({price : classes.price})
+  .from(schedules)
+  .innerJoin(classes)
+  .on(eq(schedules.classid, classes.classid))
+  .where(eq(schedules.scheduleid, scheduleid))
+  .execute()
+  .then((data) => {
+    if(data[0].price != paidAmount){
+      res.status(400).send("Incorrect amount paid");
+      return;
+    }
+  })
+
+  const result = await db
+    .insert(invoices)
+    .values({
+      memberid: memberid,
+      amount: paidAmount,
+      date: new Date(),
+      status: "paid",
+      scheduleid: scheduleid,
+    })
+    .execute()
+    .then(async () => {
+      await db.set(schedules)
+              .values({status: "booked"})
+              .where(eq(schedules.scheduleid, scheduleid))
+              .execute()
+              .then(() => {
+                console.log("Successfully updated schedule status")
+              })
+              .catch((err) => {
+                console.log(err);
+                res.status(500).send("An error occurred while updating schedule status");
+                return;
+              })
+      return res.status(200).send("Bill paid successfully. Booking Complete!");
+    })
+    .catch((err) => {
+       console.log(err)
+       res.status(500).send("An error occurred while paying bill");
+       return;
+    })
+})
+
+// create a schedule: group for admins and personal for members
+app.post("/createSchedule/:type", async (req, res) => {
+  const authHeader = req.headers["authorization"];
+  const { id, classid, roomid, date, start_time, duration, status="pending", trainerid } = req.query;
+  const {type} = req.params;
+  const { tokenErr, user } = await verifyToken(authHeader);
+  if (tokenErr?.status == 401) {
+    return res.status(tokenErr.status).send(tokenErr.message);
+  } else if (tokenErr?.status) {
+    return res.status(tokenErr.status).send(tokenErr.message);
+  }
+  // creating schedule for group class for admin
+  if(type == "group" && user.role == "admin"){
+    await db.insert(schedules)
+            .values({
+              classid: classid,
+              roomid: roomid,
+              date: date,
+              start_time: start_time,
+              duration: duration,
+              status: status
+            })
+            .returning({scheduleid: schedules.scheduleid})
+            .execute()
+            .then(async (data) => {
+              await db.insert(trainer_schedule)
+                .values({trainerid: trainerid, scheduleid: data.scheduleid})
+                .execute()
+                .then(() => {
+                  console.log("Trainer schedule created successfully");
+                })
+                .catch((err) => {
+                  console.log(err);
+                  res.status(500).send("An error occurred while creating trainer schedule");
+                  return;
+                })
+              return res.status(200).send("Schedule created successfully");
+            })
+            .catch((err) => {
+              console.log(err);
+              res.status(500).send("An error occurred while creating schedule");
+              return;
+            })
+    return;
+  }
+  // creating schedule for personal class for member
+  else if(type == "personal" && user.role == "member"){
+    await db.insert(schedules)
+            .values({
+              classid: classid,
+              roomid: roomid,
+              date: date,
+              start_time: start_time,
+              duration: duration,
+              status: status
+            })
+            .returning({scheduleid: schedules.scheduleid})
+            .execute()
+            .then(async (data) => {
+              await db.insert(trainer_schedule)
+                .values({trainerid: trainerid, scheduleid: data.scheduleid})
+                .execute()
+                .then(() => {
+                  console.log("Trainer schedule created successfully");
+                })
+                .catch((err) => {
+                  console.log(err);
+                  res.status(500).send("An error occurred while creating trainer schedule");
+                  return;
+                })
+              
+              await db.insert(member_schedule)
+                .values({memberid: id, scheduleid: data.scheduleid})
+                .execute()
+                .then(() => {
+                  console.log("Member schedule created successfully");
+                })
+                .catch((err) => {
+                  console.log(err);
+                  res.status(500).send("An error occurred while creating member schedule");
+                  return;
+                })
+
+              return res.status(200).send("Schedule created successfully");
+            })
+            .catch((err) => {
+              console.log(err);
+              res.status(500).send("An error occurred while creating schedule");
+              return;
+            })
+  }
+  else{
+    res.status(401).send("Unauthorized access");
+    return;
+  }
+})
+
+
+// book a group class 
+app.get("/bookPersonalTrainer", async (req, res) => {
+  const authHeader = req.headers["authorization"];
+  const { memberid, date, start_time, duration, classid, } = req.query;
+
+  const { tokenErr, user } = await verifyToken(authHeader);
+  if (tokenErr?.status == 401) {
+    if (user.userid != memberid) {
+      // Handle unauthorized access
+      return res.status(401).json({ error: "Unauthorized access" });
+    }
+  }
+  await db.select({scheduleid: schedules.scheduleid})
+          .from(schedules)
+          .where(and(eq(schedules.date, date), eq(schedules.start_time, start_time), eq(schedules.duration, duration), eq(schedules.classid, classid)))
+});
+
+
+
+// browse list of trainers and book a personal session from their available hours
 
 
 //trainer getters
@@ -685,7 +904,13 @@ app.get("/getAllInvoices", async (req, res) => {
     });
 })
 
+
 // TODO: Post requests for admin stuffs
+
+
+app.use((req, res) => {
+  res.status(404).send({ message: 'Route not found' });
+});
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
