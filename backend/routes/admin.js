@@ -51,7 +51,7 @@ router.get("/getAllEquipments", async (req, res) => {
       });
 })
   
-  
+
 // get all invoices
 router.get("/getAllInvoices", async (req, res) => {
     const { memberid } = req.query;
@@ -74,7 +74,51 @@ router.get("/getAllInvoices", async (req, res) => {
       });
 })
   
-// TODO: Post requests for admin stuffs
-  
+// update the room for a schedule
+router.put("/updateRoom", async (req, res) => {
+    const { roomid, scheduleid } = req.query;
+    const { user } = req.user;
+    if(user.role != "admin"){
+      res.status(401).send("Unauthorized access");
+      return;
+    }
+    const result = await db
+      .update(schedules)
+      .set({
+        roomid: roomid
+      })
+      .execute()
+      .then((data) => {
+        res.status(200).send("Room updated successfully");
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("An error occurred while updating room");
+      });
+})
+
+//update equipment status
+router.put('/updateEquipmentStatus', async (req, res) => {
+    const { equipmentid, status } = req.query;
+    const { user } = req.user;
+    if(user.role != "admin"){
+      res.status(401).send("Unauthorized access");
+      return;
+    }
+    const result = await db
+      .update(equipments)
+      .set({
+        status: status
+      })
+      .where(eq(equipments.equipmentid, equipmentid))
+      .execute()
+      .then((data) => {
+        res.status(200).send("Equipment status updated successfully");
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("An error occurred while updating equipment status");
+      });
+})
 
 module.exports = router;

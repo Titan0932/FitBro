@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { eq } = require("drizzle-orm");
+const { eq, and } = require("drizzle-orm");
 
 const db = require("../dbConnect");
 const {
@@ -59,9 +59,112 @@ router.get("/getTrainerAvailability", async (req, res) => {
       });
 })
   
+router.get("getTrainerSchedule/:filterDate", async (req, res) => {
+    const { trainerid } = req.query;
+    const { user } = req.user;
+    const {filterDate} = req.params;
+
+    if(user.role != "trainer" && user.userid != trainerid){
+        res.status(401).send("Unauthorized access");
+        return;
+    }
+
+    const whereClause = eq(trainer_availability.trainerid, trainerid)
+    if(filterDate != 'all')
+      whereClause = and(eq(trainer_availability.trainerid, trainerid), eq(trainer_availability.date, filterDate));
+    
+    const result = await db
+      .select()
+      .from(trainer_availability)
+      .where(whereClause)
+      .execute()
+      .then((data) => {
+        res.status(200).send(data);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("An error occurred while fetching trainer availability");
+      });
+})
   
 // TODO: Post requests for trainer stuffs
-  
+  // add new availability
+router.post('/addAvailability', async (req, res) => {
+  const {curuser} = req.user;
+  const {date, start_time, end_time, trainerid} = req.body; 
+  if(curuser.role != "trainer" && curuser.userid != trainerid){
+    res.status(401).send("Unauthorized access");
+    return;
+  }
+  const result = await db
+    .insert(trainer_availability)
+    .values({
+      trainerid: trainerid,
+      date: date,
+      start_time: start_time,
+      end_time: end_time,
+    })
+    .execute()
+    .then((data) => {
+      res.status(200).send("Availability added successfully");
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send(err);
+    });
+})
 
+  //remove availability
+  router.post("/removeAvailability", async (req, res) => {
+    const {curuser} = req.user;
+    const {availabilityid} = req.query
+    if(curuser.role != "trainer" && curuser.userid != trainerid){
+      res.status(401).send("Unauthorized access");
+      return;
+    }
+    const result = await db
+      .delete()
+      .from(trainer_availability)
+      .where(eq(trainer_availability.availabilityid, availabilityid))
+      .execute()
+      .then((data) => {
+        res.status(200).send("Availability removed successfully");
+        return;
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send(err);
+        return;
+      });
+  
+  })
+
+  //update availability
+  router.put("/updateAvailability", async (req, res) => {
+    const {curuser} = req.user;
+    const {availabilityid, date, start_time, end_time} = req.body;
+    if(curuser.role != "trainer" && curuser.userid != trainerid){
+      res.status(401).send("Unauthorized access");
+      return;
+    }
+    const result = await db
+      .update(trainer_availability)
+      .set({
+        date: date,
+        start_time: start_time,
+        end_time: end_time,
+      })
+      .where(eq(trainer_availability.availabilityid, availabilityid))
+      .execute()
+      .then((data) => {
+        res.status(200).send("Availability updated successfully");
+        return;
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send(err);
+        return;
+      });
+  })
 
 module.exports = router;

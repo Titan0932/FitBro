@@ -251,5 +251,33 @@ router.get("/getMemberInvoice", async (req, res) => {
 })
 
 
+router.get("/getMemberSchedule:filterDate", async (req, res) => {
+    const { memberid } = req.query;
+    const { user } = req.user;
+    const {filterDate} = req.params;
+  
+    if(user.role != "member" && user.userid != memberid){
+        res.status(401).send("Unauthorized access");
+        return;
+    }
+  
+    const whereClause = eq(schedules.memberid, memberid)
+    if(filterDate){
+      whereClause.and(eq(schedules.date, filterDate));
+    }
+  
+    const result = await db
+      .select()
+      .from(schedules)
+      .where(whereClause)
+      .execute()
+      .then((data) => {
+        res.status(200).send(data);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("An error occurred while fetching member schedule");
+      });
+})
 
 module.exports = router;
