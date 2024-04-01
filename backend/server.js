@@ -1,9 +1,10 @@
 require("dotenv").config();
 
 const express = require("express");
+require("dotenv").config();
 
 const app = express();
-const port = 3005;
+const port = process.env.APP_PORT || 3005;
 
 const userRoutes = require('./routes/users');
 const classRoutes = require('./routes/classes');
@@ -14,6 +15,13 @@ const adminRoutes = require('./routes/admin');
 
 const {authMiddleware} = require("./utils/auth");
 
+const cors = require('cors');
+
+app.use(cors({
+  origin: process.env.CORS
+}));
+
+app.use(express.urlencoded({ extended: true }));
 
 app.use('/users', userRoutes);
 
