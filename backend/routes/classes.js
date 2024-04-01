@@ -14,7 +14,7 @@ const {
 
 // to get all group classes
 router.get("/getAllGroupClasses", async (req, res) => {
-    const { user } = req.user;
+    const { user } = req;
   
     const result = await db
       .select({
@@ -39,9 +39,9 @@ router.get("/getAllGroupClasses", async (req, res) => {
   
   // to get the schedule of a class in ascending order of date and time
 router.get("/getClassSchedule", async (req, res) => {
-   const { classid } = req.query;
+   const { classid } = req.body;
   
-    const { user } = req.user;
+    const { user } = req;
   
     const result = await db
       .select({
@@ -73,8 +73,8 @@ router.get("/getClassSchedule", async (req, res) => {
 
 // get all classes
 router.get("/getAllClasses", async (req, res) => {
-  // const { classid } = req.query;
-  const { user } = req.user;
+  // const { classid } = req.body;
+  const { user } = req;
   if(user.role != "admin"){
     res.status(401).send("Unauthorized access");
     return;

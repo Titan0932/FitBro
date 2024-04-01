@@ -12,7 +12,7 @@ const {
 
 // get all rooms
 router.get("/getAllRooms", async (req, res) => {
-    const { user } = req.user;
+    const { user } = req;
     if(user.role != "admin"){
       res.status(401).send("Unauthorized access");
       return;
@@ -31,8 +31,8 @@ router.get("/getAllRooms", async (req, res) => {
 })
   
 router.get("/getAllEquipments", async (req, res) => {
-    const { roomid } = req.query;
-    const { user } = req.user;
+    const { roomid } = req.body;
+    const { user } = req;
     if(user.role != "admin"){
       res.status(401).send("Unauthorized access");
       return;
@@ -54,8 +54,8 @@ router.get("/getAllEquipments", async (req, res) => {
 
 // get all invoices
 router.get("/getAllInvoices", async (req, res) => {
-    const { memberid } = req.query;
-    const { user } = req.user;
+    const { memberid } = req.body;
+    const { user } = req;
     if(user.role != "admin"){
       res.status(401).send("Unauthorized access");
       return;
@@ -76,8 +76,8 @@ router.get("/getAllInvoices", async (req, res) => {
   
 // update the room for a schedule
 router.put("/updateRoom", async (req, res) => {
-    const { roomid, scheduleid } = req.query;
-    const { user } = req.user;
+    const { roomid, scheduleid } = req.body;
+    const { user } = req;
     if(user.role != "admin"){
       res.status(401).send("Unauthorized access");
       return;
@@ -99,8 +99,8 @@ router.put("/updateRoom", async (req, res) => {
 
 //update equipment status
 router.put('/updateEquipmentStatus', async (req, res) => {
-    const { equipmentid, status } = req.query;
-    const { user } = req.user;
+    const { equipmentid, status } = req.body;
+    const { user } = req;
     if(user.role != "admin"){
       res.status(401).send("Unauthorized access");
       return;

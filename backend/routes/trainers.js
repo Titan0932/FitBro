@@ -12,7 +12,7 @@ const {
 
 // to get all trainers 
 router.get("/getAllTrainers", async (req, res) => {
-    const { user } = req.user;
+    const { user } = req;
     
     const result = await db
       .select({
@@ -37,8 +37,8 @@ router.get("/getAllTrainers", async (req, res) => {
   
   // anyone can see the availability for a trainer
 router.get("/getTrainerAvailability", async (req, res) => {
-    const { trainerid } = req.query;
-    const { user } = req.user;
+    const { trainerid } = req.body;
+    const { user } = req;
     
     const result = await db
       .select({
@@ -60,8 +60,8 @@ router.get("/getTrainerAvailability", async (req, res) => {
 })
   
 router.get("getTrainerSchedule/:filterDate", async (req, res) => {
-    const { trainerid } = req.query;
-    const { user } = req.user;
+    const { trainerid } = req.body;
+    const { user } = req;
     const {filterDate} = req.params;
 
     if(user.role != "trainer" && user.userid != trainerid){
@@ -117,7 +117,7 @@ router.post('/addAvailability', async (req, res) => {
   //remove availability
   router.post("/removeAvailability", async (req, res) => {
     const {curuser} = req.user;
-    const {availabilityid} = req.query
+    const {availabilityid} = req.body
     if(curuser.role != "trainer" && curuser.userid != trainerid){
       res.status(401).send("Unauthorized access");
       return;

@@ -16,10 +16,10 @@ const {
 
 // to get member's incomplete fitness goals
 router.get("/getFitnessGoals/:status", async (req, res) => {
-    const { memberid } = req.query;
+    const { memberid } = req.body;
     const { status } = req.params;
   
-    const { user } = req.user;
+    const { user } = req;
     
     if(user.userid != memberid){
       res.status(401).send("Unauthorized access");
@@ -54,9 +54,9 @@ router.get("/getFitnessGoals/:status", async (req, res) => {
   
   // get member's health metrics
 router.get("/getHealthMetrics", async (req, res) => {
-    const { memberid } = req.query;
+    const { memberid } = req.body;
   
-    const { user } = req.user;
+    const { user } = req;
   
     if(user.userid != memberid){
       res.status(401).send("Unauthorized access");
@@ -78,8 +78,8 @@ router.get("/getHealthMetrics", async (req, res) => {
 })
   
 router.get("/getWeeklyRoutines", async (req, res) => {
-    const { memberid } = req.query;
-    const { user } = req.user;
+    const { memberid } = req.body;
+    const { user } = req;
     
     if(user.userid != memberid){
       res.status(401).send("Unauthorized access");
@@ -105,9 +105,9 @@ router.get("/getWeeklyRoutines", async (req, res) => {
   
   // select an exercise for the specific weekly routine
 router.post("/selectExercise", async (req, res) => {
-    const { memberid, exerciseid, week_date, rep, weight } = req.query;
+    const { memberid, exerciseid, week_date, rep, weight } = req.body;
   
-    const { user } = req.user;
+    const { user } = req;
   
     if(user.userid != memberid){
       res.status(401).send("Unauthorized access");
@@ -135,9 +135,9 @@ router.post("/selectExercise", async (req, res) => {
   
   //pay a bill
 router.post("/payBill", async (req, res) => {
-    const { memberid, scheduleid, paidAmount } = req.query;
+    const { memberid, scheduleid, paidAmount } = req.body;
   
-    const { user } = req.user;
+    const { user } = req;
     if(user.userid != memberid){
       res.status(401).send("Unauthorized access");
       return;
@@ -191,8 +191,8 @@ router.post("/payBill", async (req, res) => {
 
 router.get("/getAllMembersByName", async (req, res) => {
     // console.log(authHeader)
-    const {user_fname, user_lname} = req.query;
-    const { user } = req.user;
+    const {user_fname, user_lname} = req.body;
+    const { user } = req;
     if(user.role != "admin" || user.role != "trainer"){
       res.status(401).send("Unauthorized access");
       return;
@@ -230,8 +230,8 @@ router.get("/getAllMembersByName", async (req, res) => {
 });
   
 router.get("/getMemberInvoice", async (req, res) => {
-    const { memberid } = req.query;
-    const { user } = req.user;
+    const { memberid } = req.body;
+    const { user } = req;
     if(user.userid != memberid){
       res.status(401).send("Unauthorized access");
       return;
@@ -252,8 +252,8 @@ router.get("/getMemberInvoice", async (req, res) => {
 
 
 router.get("/getMemberSchedule:filterDate", async (req, res) => {
-    const { memberid } = req.query;
-    const { user } = req.user;
+    const { memberid } = req.body;
+    const { user } = req;
     const {filterDate} = req.params;
   
     if(user.role != "member" && user.userid != memberid){

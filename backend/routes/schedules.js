@@ -15,9 +15,9 @@ const {
 
 //get member schedule
 router.get("/getMemberSchedule", async (req, res) => {
-    const { memberid } = req.query;
+    const { memberid } = req.body;
   
-    const { user } = req.user;
+    const { user } = req;
     
     const result = await db
       .select({
@@ -63,8 +63,8 @@ async function insertTrainerSchedule({ trainerid, scheduleid }) {
 }
   
 router.post("/createGroupSchedule", async (req, res) => {
-    const { id, classid, roomid, date, start_time, duration, type ,status="pending", trainerid } = req.query;
-    const { user } = req.user;
+    const { id, classid, roomid, date, start_time, duration, type ,status="pending", trainerid } = req.body;
+    const { user } = req;
   
     if(type == "group" && user.role == "admin"){
       await insertSchedule(classid, roomid, date, start_time, duration, status)
@@ -91,8 +91,8 @@ router.post("/createGroupSchedule", async (req, res) => {
 })
   
 router.post("/createPersonalSchedule", async (req, res) => {
-    const { id, classid, roomid, date, start_time, type ,duration, status="pending", trainerid } = req.query;
-    const { user } = req.user;
+    const { id, classid, roomid, date, start_time, type ,duration, status="pending", trainerid } = req.body;
+    const { user } = req;
   
     if(type == "personal" && user.role == "member"){
       await insertSchedule(classid, roomid, date, start_time, duration, status)
@@ -132,9 +132,9 @@ router.post("/createPersonalSchedule", async (req, res) => {
   
 // get a trainer's schedule
 router.get("/getTrainerSchedule", async (req, res) => {
-    const { trainerid } = req.query;
+    const { trainerid } = req.body;
   
-    const { user } = req.user;
+    const { user } = req;
     if(user.userid != trainerid){
       res.status(401).send("Unauthorized access");
       return;

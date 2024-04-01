@@ -14,6 +14,7 @@ const jwt = require("jsonwebtoken");
 async function authMiddleware(req, res, next){
   const authHeader = req.headers["authorization"];
   const { tokenErr, user } = await verifyToken(authHeader);
+
   if (tokenErr?.status) {
     return res.status(tokenErr.status).send(tokenErr.message);
   }
@@ -64,13 +65,13 @@ async function authenticateUser(email, user_passw) {
 async function checkUserRole(role, userInfo) {
     // code to check user's role and fetch additional data
     additionalData = {};
-    userRoleErr = {}; //status: 500, message: "..."
+    userRoleErr = {status:200}; //status: 500, message: "..."
     if(role.toLowerCase() == "member"){
       await db.select().from(members).where(eq(members.memberid, userInfo.userid))
       .then((memberData) => {
         console.log("memberData: ", memberData);
         if(memberData.length == 0){
-          userRoleErr.status = 200;
+          userRoleErr.status = 404;
           userRoleErr.message = "User not registered as a Member!";
         }
         else{
@@ -87,7 +88,7 @@ async function checkUserRole(role, userInfo) {
       .then((trainerData) => {
         console.log("trainerData: ", trainerData);
         if(trainerData.length == 0){
-          userRoleErr.status = 200;
+          userRoleErr.status = 404;
           userRoleErr.message = "User not registered as a Trainer!";
         }else{
           additionalData['speciality'] = trainerData[0].speciality;
@@ -96,16 +97,15 @@ async function checkUserRole(role, userInfo) {
     }else if(role.toLowerCase() == "admin"){
         await db.select().from(admins).where(eq(admins.adminid, userInfo.userid))
         .then((adminData) => {
-          console.log("adminData: ", adminData);
           if(adminData.length == 0){
-            userRoleErr.status = 200;
+            userRoleErr.status = 404;
             userRoleErr.message = "User not registered as an Admin!";
           }
         })
-    }else{
-      userRoleErr.status = 500;
-      userRoleErr.message = "Invalid role";
-    }
+      }else{
+        userRoleErr.status = 500;
+        userRoleErr.message = "Invalid role";
+      }
     return {userRoleErr, additionalData};
   
 }
@@ -188,19 +188,16 @@ async function checkUserEmailExists(email){
  * @returns {Promise<{userCheckError: Object, userExists: boolean}>} - A promise that resolves to an object containing the user check error and a boolean indicating if the user exists.
  */
 async function checkUserEmailRoleExists(email, role) {
-  let userExists = false;
+  let userExists = true;
   let userCheckError = {};
   await db.select({userid: users.userid,}).from(users).where(eq(users.email, email))
   .then( async (data) => {
     if(data.length > 0){
       const {userRoleErr, additionalData} = await checkUserRole(role, data[0]);
       console.log("userRoleErr: ", userRoleErr)
-      if(userRoleErr?.status == 500){
+      if(userRoleErr?.status != 200){
         userCheckError = userRoleErr;
-      }else if(userRoleErr?.status == 200){
         userExists = false;
-      }else{
-        userExists = true;
       }
     }
   })
