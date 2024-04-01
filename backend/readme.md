@@ -55,10 +55,9 @@ POST /register
 
 GET /getUserInfo
 
-    Description: Retrieves user information.
+    Description: Retrieves user information using token info for the user email.
 
-    Query Parameters:
-        email: User's email address (String)
+    
 
     Success Response:
         Status Code: 200
@@ -103,7 +102,35 @@ PUT /updateUserInfo
         If there's an error updating user info:
             Status Code: 500
             Response Body: Error message
+			
+---
 
+POST /checkUserEmailRoleExists
+
+    Description:
+        Checks if a user with a specific role exists.
+
+    Request Body:
+        - role: Role of the user to check (String)
+
+    Request Headers:
+        - Authorization: Bearer token for the authenticated user
+
+    Success Responses:
+        Status Code: 200 OK
+        Response Body: `true` if a user with the specified role exists, `false` otherwise
+
+    Error Responses:
+        Status Code: 401 Unauthorized
+        Response Body: "Unauthorized access"
+
+        Status Code: 404 Not Found
+        Response Body: `false` if a user with the specified role does not exist
+
+        Status Code: 500 Internal Server Error
+        Response Body: "An error occurred while checking user existence"
+
+---
 
 ## Classes
 
