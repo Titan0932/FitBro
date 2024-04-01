@@ -1,176 +1,189 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
 const { eq } = require("drizzle-orm");
 
 const {
-    authenticateUser,
-    checkUserRole,
-    generateJwtToken,
-    checkUserEmailRoleExists,
-    checkUserEmailExists,
-    authMiddleware
-  } = require("../utils/auth");
+  authenticateUser,
+  checkUserRole,
+  generateJwtToken,
+  checkUserEmailRoleExists,
+  checkUserEmailExists,
+  authMiddleware,
+} = require("../utils/auth");
 
-const {users} = require("../db/schema");
+const { users } = require("../db/schema");
 
 const getPwHash = require("../utils/pw_Hashing").getPwHash;
-const { insertUserIntoRoleTable } = require('../db/userOperations');
-
+const { insertUserIntoRoleTable } = require("../db/userOperations");
+const db = require("../dbConnect");
 
 router.post("/login", async (req, res) => {
-    // console.log(req)
-    const { email, user_passw, role="member" } = req.query;
-  
-    const { userAuthError, userInfo } = await authenticateUser(email, user_passw);
-    console.log("AUTH: ", userAuthError)
-    if (userAuthError?.status) {
-      return res.status(userAuthError.status).send(userAuthError.message);
-    }
-    const { userRoleErr, additionalData } = checkUserRole(role, userInfo);
-    if (userRoleErr?.status) {
-      return res.status(userRoleErr.status).send(userRoleErr.message);
-    }
-    const jwtToken = generateJwtToken(email, role.toLowerCase());
-  
-    successfulObj = {
-      status: 200,
-      message: "Login successful",
-      jwtToken,
-    };
-    return res.send(successfulObj);
+  const { email, user_passw, role = "member" } = req.body;
+  const { userAuthError, userInfo } = await authenticateUser(email, user_passw);
+  console.log("AUTH: ", userAuthError);
+  if (userAuthError?.status) {
+    return res.status(userAuthError.status).send(userAuthError.message);
+  }
+  const { userRoleErr, additionalData } = await checkUserRole(role, userInfo);
+  if (userRoleErr?.status) {
+    return res.status(userRoleErr.status).send(userRoleErr.message);
+  }
+  const jwtToken = generateJwtToken(email, role.toLowerCase());
+
+  successfulObj = {
+    status: 200,
+    message: "Login successful",
+    jwtToken,
+  };
+  return res.send(successfulObj);
 });
-  
 
 router.post("/register", async (req, res) => {
-const { email, f_name, l_name, user_passw, user_dob, role } = req.query;
-// console.log("QUERY: " ,req.query)
-// Query database to insert the new user
-// code that inserts the new user into the database
-const { checkErr, check } = await checkUserEmailExists(email);
-console.log(checkErr, check);
-if (checkErr?.status) {
+
+  const { email, f_name, l_name, user_passw, user_dob, role } = req.body;
+  // console.log("QUERY: " ,req.body)
+  // Query database to insert the new user
+  // code that inserts the new user into the database
+  const { checkErr, check } = await checkUserEmailExists(email);
+  console.log(checkErr, check);
+  if (checkErr?.status) {
     return res.status(checkErr.status).send(checkErr.message);
-}
-let userId;
-if (!check) {
+  }
+  let userId;
+  if (!check) {
     const { getHasherr, hashedPw } = await getPwHash(user_passw);
     if (getHasherr) {
-    res.status(500).send("Error registering user");
-    return;
+      res.status(500).send("Error registering user");
+      return;
     }
     // Insert user into users table and get userId
     userId = await db
-    .insert(users)
-    .values({
+      .insert(users)
+      .values({
         email: email,
         user_passw: hashedPw,
         f_name: f_name,
         l_name: l_name,
         user_dob: user_dob,
-    })
-    .returning({ userid: users.userid })
-    .execute();
+      })
+      .returning({ userid: users.userid })
+      .execute();
     userId = userId[0].userid;
-} else {
+  } else {
     // Get userId of existing user
     userId = await db
-    .select({ userid: users.userid })
-    .from(users)
-    .where(eq(users.email, email))
-    .execute();
+      .select({ userid: users.userid })
+      .from(users)
+      .where(eq(users.email, email))
+      .execute();
     userId = userId[0].userid;
-}
-const { userCheckError, userExists } = await checkUserEmailRoleExists(
+  }
+  const { userCheckError, userExists } = await checkUserEmailRoleExists(
     email,
     role
-);
-if (userCheckError?.status) {
-    return res.status(userCheckError.status).send(userCheckError.message);
-}
-if (userExists) {
+  );
+  if (userExists) {
     return res.status(400).send("User already exists");
-}
-// Insert user into the appropriate role table
-try {
+  }else if (userCheckError?.status) {
+    return res.status(userCheckError.status).send(userCheckError.message);
+  }
+  // Insert user into the appropriate role table
+  try {
     await insertUserIntoRoleTable(role, userId);
-} catch (err) {
+  } catch (err) {
     return res.status(500).send(err.message);
-}
-return res.status(200).send("User registered successfully");
+  }
+  return res.status(200).send("User registered successfully");
 });
 
+router.get("/getUserInfo", authMiddleware, async (req, res) => {
+  const { user } = req;
 
-router.get("/getUserInfo", authMiddleware ,async (req, res) => {
-const { email } = req.query;
-const { user } = req.user;
-
-if(user.email != email){
+  if (!user) {
     res.status(401).send("Unauthorized access");
     return;
-}
-const result = await db
+  }
+  const result = await db
     .select()
     .from(users)
-    .where(eq(users.email, email))
+    .where(eq(users.email, user.email))
     .execute()
     .then((data) => {
-    res.status(200).send(data);
+      const { user_passw, ...userData } = data["0"];
+      res.status(200).send(userData);
     })
     .catch((err) => {
-    console.log(err);
-    res.status(500).send("An error occurred while fetching user info");
+      console.log(err);
+      res.status(500).send("An error occurred while fetching user info");
     });
 });
 
-
 router.put("/updateUserInfo", authMiddleware, async (req, res) => {
-const { email, f_name, l_name, user_passw, user_dob, new_passw } = req.query;
-const { user } = req.user;
-if(user.email != email){
+
+  const { email, f_name, l_name, user_passw, user_dob, new_passw } = req.body;
+  const { user } = req;
+  if (user.email != email) {
     res.status(401).send("Unauthorized access");
     return;
-}
-const { userAuthError, userInfo } = await authenticateUser(email, user_passw);
-if (userAuthError?.status) {
+  }
+  const { userAuthError, userInfo } = await authenticateUser(email, user_passw);
+  if (userAuthError?.status) {
     return res.status(userAuthError.status).send(userAuthError.message);
-}
-updateObj = {};
-if (f_name) {
+  }
+  updateObj = {};
+  if (f_name) {
     updateObj.f_name = f_name;
-}
-if (l_name) {
+  }
+  if (l_name) {
     updateObj.l_name = l_name;
-}
-if (user_dob) {
+  }
+  if (user_dob) {
     updateObj.user_dob = user_dob;
-}
-if (new_passw) {
+  }
+  if (new_passw) {
     const { getHasherr, hashedPw } = await getPwHash(new_passw);
     if (getHasherr) {
-    res.status(500).send("Error updating user info");
-    return;
+      res.status(500).send("Error updating user info");
+      return;
     }
     updateObj.user_passw = hashedPw;
-}
-if(Object.keys(updateObj).length == 0){
+  }
+  if (Object.keys(updateObj).length == 0) {
     res.status(404).send("No data provided to update user info");
     return;
-}
-db.update(users)
+  }
+  db.update(users)
     .set(updateObj)
     .where(eq(users.userid, userInfo.userid))
     .execute()
     .then(() => {
-    res.status(200).send("User info updated successfully");
+      res.status(200).send("User info updated successfully");
     })
     .catch((err) => {
-    console.log(err);
-    res.status(500).send("An error occurred while updating user info");
+      console.log(err);
+      res.status(500).send("An error occurred while updating user info");
     });
+});
 
+router.post("/checkUserEmailRoleExists", authMiddleware, async (req, res) => {
+  const { user } = req;
+  if (!user) {
+    res.status(401).send("Unauthorized access");
+    return;
+  }
+  const { role } = req.body;
+  const { userCheckError, userExists } = await checkUserEmailRoleExists(
+    user.email,
+    role
+  );
+  if(userExists){
+    res.status(200).send(userExists);
+  }else if(userCheckError?.status){
+    res.status(userCheckError.status).send(userCheckError.message);
+  }else{
+    res.status(404).send("User not found");
+  }
 })
-  
-
 
 module.exports = router;

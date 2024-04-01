@@ -1,43 +1,45 @@
 import type { NavItemConfig } from '@/types/nav';
 import { paths } from '@/paths';
-import { UserContext } from '@/contexts/user-context';
-import React from 'react';
 
-const user = React.useContext(UserContext);
 
-const memberNavitems = [
+export const memberNavitems = [
   { key: 'overview', title: 'Dashboard', href: paths.dashboard.overview, icon: 'chart-pie' },
-  { key: 'customers', title: 'Customers', href: paths.dashboard.customers, icon: 'users' },
-  { key: 'settings', title: 'Settings', href: paths.dashboard.settings, icon: 'gear-six' },
+  { key: 'Trainers', title: 'Trainers', href: paths.dashboard.trainers, icon: 'users' },
+  { key: 'Schedule', title: 'Schedule', href: paths.dashboard.memberSchedule, icon: 'users' },
   { key: 'account', title: 'Account', href: paths.dashboard.account, icon: 'user' },
+  // { key: 'settings', title: 'Settings', href: paths.dashboard.settings, icon: 'gear-six' },
   // { key: 'integrations', title: 'Integrations', href: paths.dashboard.integrations, icon: 'plugs-connected' },
   // { key: 'error', title: 'Error', href: paths.errors.notFound, icon: 'x-square' },
 ] satisfies NavItemConfig[];
 
-const trainerNavitems = [
+export const trainerNavitems = [
   { key: 'overview', title: 'Overview', href: paths.dashboard.overview, icon: 'chart-pie' },
-  { key: 'customers', title: 'Customers', href: paths.dashboard.customers, icon: 'users' },
-  { key: 'integrations', title: 'Integrations', href: paths.dashboard.integrations, icon: 'plugs-connected' },
-  { key: 'settings', title: 'Settings', href: paths.dashboard.settings, icon: 'gear-six' },
+  { key: 'Members', title: 'Members', href: paths.dashboard.members, icon: 'users' },
   { key: 'account', title: 'Account', href: paths.dashboard.account, icon: 'user' },
-  { key: 'error', title: 'Error', href: paths.errors.notFound, icon: 'x-square' },
+  { key: 'Schedule', title: 'Schedule', href: paths.dashboard.trainerSchedule, icon: 'user' },
+  // { key: 'integrations', title: 'Integrations', href: paths.dashboard.integrations, icon: 'plugs-connected' },
+  // { key: 'settings', title: 'Settings', href: paths.dashboard.settings, icon: 'gear-six' },
+  // { key: 'error', title: 'Error', href: paths.errors.notFound, icon: 'x-square' },
 ] satisfies NavItemConfig[];
 
-const adminNavitems = [
+export const adminNavitems = [
   { key: 'overview', title: 'Overview', href: paths.dashboard.overview, icon: 'chart-pie' },
-  { key: 'customers', title: 'Customers', href: paths.dashboard.customers, icon: 'users' },
-  { key: 'integrations', title: 'Integrations', href: paths.dashboard.integrations, icon: 'plugs-connected' },
-  { key: 'settings', title: 'Settings', href: paths.dashboard.settings, icon: 'gear-six' },
+  { key: 'Members', title: 'Members', href: paths.dashboard.members, icon: 'users' },
+  { key: 'Trainers', title: 'Trainers', href: paths.dashboard.trainers, icon: 'users' },
+  { key: 'Rooms', title: 'Rooms', href: paths.dashboard.rooms, icon: 'users' },
+  { key: 'Equipments', title: 'Equipments', href: paths.dashboard.equipments, icon: 'users' },
   { key: 'account', title: 'Account', href: paths.dashboard.account, icon: 'user' },
-  { key: 'error', title: 'Error', href: paths.errors.notFound, icon: 'x-square' },
+  // { key: 'integrations', title: 'Integrations', href: paths.dashboard.integrations, icon: 'plugs-connected' },
+  // { key: 'settings', title: 'Settings', href: paths.dashboard.settings, icon: 'gear-six' },
+  // { key: 'error', title: 'Error', href: paths.errors.notFound, icon: 'x-square' },
 ] satisfies NavItemConfig[];
 
 
-export const navItems = [
-  { key: 'overview', title: 'Overview', href: paths.dashboard.overview, icon: 'chart-pie' },
-  { key: 'customers', title: 'Customers', href: paths.dashboard.customers, icon: 'users' },
-  { key: 'integrations', title: 'Integrations', href: paths.dashboard.integrations, icon: 'plugs-connected' },
-  { key: 'settings', title: 'Settings', href: paths.dashboard.settings, icon: 'gear-six' },
-  { key: 'account', title: 'Account', href: paths.dashboard.account, icon: 'user' },
-  { key: 'error', title: 'Error', href: paths.errors.notFound, icon: 'x-square' },
-] satisfies NavItemConfig[];
+// export const navItems = [
+//   { key: 'overview', title: 'Overview', href: paths.dashboard.overview, icon: 'chart-pie' },
+//   { key: 'customers', title: 'Customers', href: paths.dashboard.customers, icon: 'users' },
+//   { key: 'integrations', title: 'Integrations', href: paths.dashboard.integrations, icon: 'plugs-connected' },
+//   { key: 'settings', title: 'Settings', href: paths.dashboard.settings, icon: 'gear-six' },
+//   { key: 'account', title: 'Account', href: paths.dashboard.account, icon: 'user' },
+//   { key: 'error', title: 'Error', href: paths.errors.notFound, icon: 'x-square' },
+// ] satisfies NavItemConfig[];

@@ -1,15 +1,15 @@
 export const paths = {
   home: '/',
   auth: { signIn: '/auth/sign-in', signUp: '/auth/sign-up', resetPassword: '/auth/reset-password' },
-  schedule: {
-    root: '/schedule',
-    new: '/schedule/new',
-    view: '/schedule/:id',
-  },
   dashboard: {
+    trainers: '/dashboard/trainers',
     overview: '/dashboard',
     account: '/dashboard/account',
-    customers: '/dashboard/customers',
+    members: '/dashboard/members',
+    memberSchedule: '/dashboard/memberSchedule',
+    trainerSchedule: '/dashboard/trainerSchedule',
+    rooms: '/dashboard/rooms',
+    equipments: '/dashboard/equipments',
     integrations: '/dashboard/integrations',
     settings: '/dashboard/settings',
   },
