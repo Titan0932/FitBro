@@ -21,7 +21,8 @@ import { z as zod } from 'zod';
 import { paths } from '@/paths';
 import { authClient } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
-import { Role_select } from './role_select';
+import { RoleSelect } from './RoleSelect';
+import { UserContext } from '@/contexts/user-context';
 
 const schema = zod.object({
   email: zod.string().min(1, { message: 'Email is required' }).email(),
@@ -40,6 +41,8 @@ export function SignInForm(): React.JSX.Element {
   const [showPassword, setShowPassword] = React.useState<boolean>();
 
   const [isPending, setIsPending] = React.useState<boolean>(false);
+  
+  const user = React.useContext(UserContext);
 
   const {
     control,
@@ -51,15 +54,12 @@ export function SignInForm(): React.JSX.Element {
   const onSubmit = React.useCallback(
     async (values: Values): Promise<void> => {
       setIsPending(true);
-
-      const { error } = await authClient.signInWithPassword(values);
-
+      const { error } = await authClient.signInWithPassword(values, user);
       if (error) {
         setError('root', { type: 'server', message: error });
         setIsPending(false);
         return;
       }
-
       // Refresh the auth state
       await checkSession?.();
 
@@ -67,13 +67,13 @@ export function SignInForm(): React.JSX.Element {
       // After refresh, GuestGuard will handle the redirect
       router.refresh();
     },
-    [checkSession, router, setError]
+    [checkSession, router, setError, user]
   );
 
   return (
     <Stack spacing={4}>
       <Stack spacing={1}>
-        <Typography variant="h4">Sign in as </Typography> <Role_select />
+        <Typography variant="h4">Sign in as </Typography> <RoleSelect redirect={false} />
         <Typography color="text.secondary" variant="body2">
           Don&apos;t have an account?{' '}
           <Link component={RouterLink} href={paths.auth.signUp} underline="hover" variant="subtitle2">

@@ -21,7 +21,7 @@ import { z as zod } from 'zod';
 import { paths } from '@/paths';
 import { authClient } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
-import { Role_select } from './role_select';
+import { RoleSelect } from './RoleSelect';
 
 const schema = zod.object({
   firstName: zod.string().min(1, { message: 'First name is required' }),
@@ -74,7 +74,7 @@ export function SignUpForm(): React.JSX.Element {
   return (
     <Stack spacing={3}>
       <Stack spacing={1}>
-        <Typography variant="h4">Sign up as</Typography> <Role_select />
+        <Typography variant="h4">Sign up as</Typography> <RoleSelect redirect = {false} />
         <Typography color="text.secondary" variant="body2">
           Already have an account?{' '}
           <Link component={RouterLink} href={paths.auth.signIn} underline="hover" variant="subtitle2">

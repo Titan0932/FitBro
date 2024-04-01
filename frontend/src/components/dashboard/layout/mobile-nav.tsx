@@ -4,22 +4,23 @@ import * as React from 'react';
 import RouterLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
+// import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { ArrowSquareUpRight as ArrowSquareUpRightIcon } from '@phosphor-icons/react/dist/ssr/ArrowSquareUpRight';
-import { CaretUpDown as CaretUpDownIcon } from '@phosphor-icons/react/dist/ssr/CaretUpDown';
+// import { ArrowSquareUpRight as ArrowSquareUpRightIcon } from '@phosphor-icons/react/dist/ssr/ArrowSquareUpRight';
+// import { CaretUpDown as CaretUpDownIcon } from '@phosphor-icons/react/dist/ssr/CaretUpDown';
 
 import type { NavItemConfig } from '@/types/nav';
 import { paths } from '@/paths';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 import { Logo } from '@/components/core/logo';
 
-import { navItems } from './config';
+import { trainerNavitems, adminNavitems, memberNavitems } from './config';
 import { navIcons } from './nav-icons';
-import { Role_select } from '@/components/auth/role_select';
+import { RoleSelect } from '@/components/auth/RoleSelect';
+import { UserContext } from '@/contexts/user-context';
 
 export interface MobileNavProps {
   onClose?: () => void;
@@ -29,6 +30,7 @@ export interface MobileNavProps {
 
 export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element {
   const pathname = usePathname();
+  const user = React.useContext(UserContext);
 
   return (
     <Drawer
@@ -62,11 +64,11 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
         <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-flex' }}>
           <Logo color="light" height={32} width={122} />
         </Box>
-        <Role_select />
+        <RoleSelect />
       </Stack>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
       <Box component="nav" sx={{ flex: '1 1 auto', p: '12px' }}>
-        {renderNavItems({ pathname, items: navItems })}
+        {renderNavItems({ pathname, items: user?.role === 'Trainer' ? trainerNavitems : user?.role === 'Admin' ? adminNavitems : memberNavitems,  onClose})}
       </Box>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
       
@@ -74,11 +76,11 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
   );
 }
 
-function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pathname: string }): React.JSX.Element {
+function renderNavItems({ items = [], pathname, onClose }: { items?: NavItemConfig[]; pathname: string; onClose?: () => void}): React.JSX.Element {
   const children = items.reduce((acc: React.ReactNode[], curr: NavItemConfig): React.ReactNode[] => {
     const { key, ...item } = curr;
 
-    acc.push(<NavItem key={key} pathname={pathname} {...item} />);
+    acc.push(<NavItem key={key} pathname={pathname} {...item} onClose={onClose} />);
 
     return acc;
   }, []);
@@ -92,9 +94,10 @@ function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pat
 
 interface NavItemProps extends Omit<NavItemConfig, 'items'> {
   pathname: string;
+  onClose?: () => void;
 }
 
-function NavItem({ disabled, external, href, icon, matcher, pathname, title }: NavItemProps): React.JSX.Element {
+function NavItem({ disabled, external, href, icon, matcher, pathname, title, onClose }: NavItemProps): React.JSX.Element {
   const active = isNavItemActive({ disabled, external, href, matcher, pathname });
   const Icon = icon ? navIcons[icon] : null;
 
@@ -128,6 +131,7 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title }: N
           }),
           ...(active && { bgcolor: 'var(--NavItem-active-background)', color: 'var(--NavItem-active-color)' }),
         }}
+        onClick={onClose}
       >
         <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', flex: '0 0 auto' }}>
           {Icon ? (

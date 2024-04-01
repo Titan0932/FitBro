@@ -1,6 +1,10 @@
 'use client';
 
+import { UserContextValue } from '@/contexts/user-context';
 import type { User } from '@/types/user';
+import { headers } from 'next/headers';
+
+const axios = require('axios');
 
 function generateToken(): string {
   const arr = new Uint8Array(12);
@@ -9,12 +13,19 @@ function generateToken(): string {
 }
 
 const user = {
-  id: 'USR-000',
+  id: '',
   avatar: '/assets/avatar.png',
-  firstName: 'Sofia',
-  lastName: 'Rivers',
-  email: 'sofia@devias.io',
+  firstName: '',
+  lastName: '',
+  email: '',
 } satisfies User;
+// const user = {
+//   id: 'USR-000',
+//   avatar: '/assets/avatar.png',
+//   firstName: 'Sofia',
+//   lastName: 'Rivers',
+//   email: 'sofia@devias.io',
+// } satisfies User;
 
 export interface SignUpParams {
   firstName: string;
@@ -51,19 +62,33 @@ class AuthClient {
     return { error: 'Social authentication not implemented' };
   }
 
-  async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
+  async signInWithPassword(params: SignInWithPasswordParams, loginUser: UserContextValue | undefined): Promise<{ error?: string }> {
     const { email, password } = params;
-
     // Make API request
+    let data = `email=${email}&user_passw=${password}&role=${loginUser?.role}`
 
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: 'http://localhost:3005/users/login',
+      data: data,
+    };
+
+    return await axios.request(config)
+      .then((response:any) => {
+        console.log(JSON.stringify(response.data));
+        localStorage.setItem('custom-auth-token', response.data.jwtToken);
+        user.email = email;
+        return {};
+      })
+      .catch((error:any) => {
+        console.log("Error: ", error);
+        return {error: error?.response?.data ?? error.message}
+      });
     // We do not handle the API, so we'll check if the credentials match with the hardcoded ones.
-    if (email !== 'sofia@devias.io' || password !== 'Secret1') {
-      return { error: 'Invalid credentials' };
-    }
-
-    const token = generateToken();
-    localStorage.setItem('custom-auth-token', token);
-
+    // if (email !== 'sofia@devias.io' || password !== 'Secret1') {
+    //   return { error: 'Invalid credentials' };
+    // }
     return {};
   }
 
@@ -77,15 +102,25 @@ class AuthClient {
 
   async getUser(): Promise<{ data?: User | null; error?: string }> {
     // Make API request
+    const token = localStorage.getItem('custom-auth-token')
+    if(token == null) return {data: null}
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: 'http://localhost:3005/users/getUserInfo',
+      data: '',
+      headers: {"Authorization": "Bearer " + localStorage.getItem('custom-auth-token')}
+    };
 
-    // We do not handle the API, so just check if we have a token in localStorage.
-    const token = localStorage.getItem('custom-auth-token');
-
-    if (!token) {
-      return { data: null };
-    }
-
-    return { data: user };
+    return await axios.request(config)
+      .then((response:any) => {
+        console.log("User data: ", JSON.stringify(response.data));
+        return {data: user};
+      })
+      .catch((error:any) => {
+        console.log("Error: ", error);
+        return {data: null}
+      });
   }
 
   async signOut(): Promise<{ error?: string }> {
