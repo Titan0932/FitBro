@@ -26,7 +26,7 @@ router.post("/login", async (req, res) => {
     return res.status(userAuthError.status).send(userAuthError.message);
   }
   const { userRoleErr, additionalData } = await checkUserRole(role, userInfo);
-  if (userRoleErr?.status) {
+  if (userRoleErr?.status!=200) {
     return res.status(userRoleErr.status).send(userRoleErr.message);
   }
   const jwtToken = generateJwtToken(email, role.toLowerCase());
