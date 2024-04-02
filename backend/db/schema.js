@@ -9,6 +9,10 @@ const users = pgTable('users', {
   l_name: text('l_name').notNull(),
   user_passw: text('user_passw').notNull(),
   user_dob: date('user_dob'),
+  city: text('city'),
+  country: text('country'),
+  phoneno: text('phoneno'),
+  state: text('state'),
 });
 
 const members = pgTable('members', {

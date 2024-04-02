@@ -6,7 +6,11 @@ CREATE TABLE users(
     f_name TEXT NOT NULL,
     l_name TEXT NOT NULL,
     user_passw TEXT NOT NULL,
-    user_dob DATE
+    user_dob DATE,
+    city TEXT,
+    country TEXT,
+    phoneNo TEXT,
+    state TEXT,
 );
 
 CREATE TABLE members(
