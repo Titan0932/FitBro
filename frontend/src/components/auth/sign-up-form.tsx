@@ -22,6 +22,7 @@ import { paths } from '@/paths';
 import { authClient } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
 import { RoleSelect } from './RoleSelect';
+import { UserContext } from '@/contexts/user-context';
 
 const schema = zod.object({
   firstName: zod.string().min(1, { message: 'First name is required' }),
@@ -29,17 +30,18 @@ const schema = zod.object({
   email: zod.string().min(1, { message: 'Email is required' }).email(),
   password: zod.string().min(6, { message: 'Password should be at least 6 characters' }),
   terms: zod.boolean().refine((value) => value, 'You must accept the terms and conditions'),
+  dob: zod.string().refine((value) => new Date(value) <= new Date(), 'Invalid date of birth'),
 });
 
 type Values = zod.infer<typeof schema>;
 
-const defaultValues = { firstName: '', lastName: '', email: '', password: '', terms: false } satisfies Values;
+const defaultValues = { firstName: '', lastName: '', email: '', password: '', terms: false, dob: ''} satisfies Values;
 
 export function SignUpForm(): React.JSX.Element {
   const router = useRouter();
 
   const { checkSession } = useUser();
-
+  const user = React.useContext(UserContext);
   const [isPending, setIsPending] = React.useState<boolean>(false);
 
   const {
@@ -52,9 +54,8 @@ export function SignUpForm(): React.JSX.Element {
   const onSubmit = React.useCallback(
     async (values: Values): Promise<void> => {
       setIsPending(true);
-
-      const { error } = await authClient.signUp(values);
-
+      const { error } = await authClient.signUp({...values, role: user?.role});
+      console.log(error)
       if (error) {
         setError('root', { type: 'server', message: error });
         setIsPending(false);
@@ -67,8 +68,9 @@ export function SignUpForm(): React.JSX.Element {
       // UserProvider, for this case, will not refresh the router
       // After refresh, GuestGuard will handle the redirect
       router.refresh();
+      router.replace(paths.auth.signIn);
     },
-    [checkSession, router, setError]
+    [checkSession, router, setError, user]
   );
 
   return (
@@ -119,6 +121,17 @@ export function SignUpForm(): React.JSX.Element {
           />
           <Controller
             control={control}
+            name="dob"
+            render={({ field }) => (
+              <FormControl error={Boolean(errors.dob)}>
+                <InputLabel>Date of Birth</InputLabel>
+                <OutlinedInput {...field} label="Date of Birth" type="date" />
+                {errors.dob ? <FormHelperText>{errors.dob.message}</FormHelperText> : null}
+              </FormControl>
+            )}
+          />
+          <Controller
+            control={control}
             name="password"
             render={({ field }) => (
               <FormControl error={Boolean(errors.password)}>
@@ -151,7 +164,7 @@ export function SignUpForm(): React.JSX.Element {
           </Button>
         </Stack>
       </form>
-      <Alert color="warning">Created users are not persisted</Alert>
+      {/* <Alert color="warning">Created users are not persisted</Alert> */}
     </Stack>
   );
 }

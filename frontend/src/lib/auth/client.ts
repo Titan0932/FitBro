@@ -2,15 +2,14 @@
 
 import { UserContextValue } from '@/contexts/user-context';
 import type { User } from '@/types/user';
-import { headers } from 'next/headers';
 
 const axios = require('axios');
 
-function generateToken(): string {
-  const arr = new Uint8Array(12);
-  window.crypto.getRandomValues(arr);
-  return Array.from(arr, (v) => v.toString(16).padStart(2, '0')).join('');
-}
+// function generateToken(): string {
+//   const arr = new Uint8Array(12);
+//   window.crypto.getRandomValues(arr);
+//   return Array.from(arr, (v) => v.toString(16).padStart(2, '0')).join('');
+// }
 
 const user = {
   id: '',
@@ -32,6 +31,8 @@ export interface SignUpParams {
   lastName: string;
   email: string;
   password: string;
+  dob: string;
+  role?: string;
 }
 
 export interface SignInWithOAuthParams {
@@ -48,12 +49,27 @@ export interface ResetPasswordParams {
 }
 
 class AuthClient {
-  async signUp(_: SignUpParams): Promise<{ error?: string }> {
+  async signUp(params: SignUpParams): Promise<{ error?: string }> {
     // Make API request
+    const { firstName, lastName, email, password, dob, role } = params;
+    let data = `email=${email}&user_passw=${password}&f_name=${firstName}&l_name=${lastName}&user_dob=${dob}&role=${role}`
 
-    // We do not handle the API, so we'll just generate a token and store it in localStorage.
-    const token = generateToken();
-    localStorage.setItem('custom-auth-token', token);
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: 'http://localhost:3005/users/register',
+      data: data,
+    };
+
+    return await axios.request(config)
+      .then((response:any) => {
+        console.log(JSON.stringify(response.data));
+        return {};
+      })
+      .catch((error:any) => {
+        console.log("Error: ", error);
+        return {error: error?.response?.data ?? error.message}
+      });
 
     return {};
   }
