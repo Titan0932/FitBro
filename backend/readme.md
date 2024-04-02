@@ -1,7 +1,7 @@
 # API Documentation
 
 ## Users
-POST /login
+POST /users/login
 
     Description: Logs a user into the system.
 
@@ -27,7 +27,7 @@ POST /login
 
 ---
 
-POST /register
+POST /users/register
 
     Description: Registers a new user in the system.
 
@@ -53,7 +53,7 @@ POST /register
 
 ---
 
-GET /getUserInfo
+GET /users/getUserInfo
 
     Description: Retrieves user information using token info for the user email.
 
@@ -73,7 +73,7 @@ GET /getUserInfo
 
 ---
 
-PUT /updateUserInfo
+PUT /users/updateUserInfo
 
     Description: Updates user information.
 
@@ -105,7 +105,7 @@ PUT /updateUserInfo
 			
 ---
 
-POST /checkUserEmailRoleExists
+POST /users/checkUserEmailRoleExists
 
     Description:
         Checks if a user with a specific role exists.
@@ -134,7 +134,7 @@ POST /checkUserEmailRoleExists
 
 ## Classes
 
-GET /getAllGroupClasses
+GET /classes/getAllGroupClasses
 
 	Description:
 		Retrieves all group classes available in the system.
@@ -155,7 +155,7 @@ GET /getAllGroupClasses
 
 ---
 
-GET /getClassSchedule
+GET /classes/getClassSchedule
 
 	Description:
 		Retrieves the schedule of a specific class in ascending order of date and time.
@@ -176,7 +176,7 @@ GET /getClassSchedule
 
 ---
 
-GET /getAllClasses
+GET /classes/getAllClasses
 
 	Description:
 		Retrieves all classes available in the system.
@@ -201,7 +201,7 @@ GET /getAllClasses
 
 ## Schedules
 
-GET /getMemberSchedule
+GET /schedules/getMemberSchedule
 
 	Description:
 		Retrieves the schedule of a member.
@@ -222,7 +222,7 @@ GET /getMemberSchedule
 
 ---
 
-POST /createGroupSchedule
+POST /schedules/createGroupSchedule
 
 	Description:
 		Creates a group schedule for a class.
@@ -254,7 +254,7 @@ POST /createGroupSchedule
 
 ---
 
-POST /createPersonalSchedule
+POST /schedules/createPersonalSchedule
 
 	Description:
 		Creates a personal schedule for a member.
@@ -286,7 +286,7 @@ POST /createPersonalSchedule
 
 ---
 
-GET /getTrainerSchedule
+GET /schedules/getTrainerSchedule
 
 	Description:
 		Retrieves the schedule of a trainer.
@@ -312,7 +312,7 @@ GET /getTrainerSchedule
 
 ## Members
 
-GET /getFitnessGoals/:status
+GET /members/getFitnessGoals/:status
 
 	Description:
 		Retrieves fitness goals of a member based on the specified status.
@@ -340,7 +340,7 @@ GET /getFitnessGoals/:status
 
 ---
 
-GET /getHealthMetrics
+GET /members/getHealthMetrics
 
 	Description:
 		Retrieves health metrics of a member.
@@ -364,7 +364,7 @@ GET /getHealthMetrics
 
 ---
 
-GET /getWeeklyRoutines
+GET /members/getWeeklyRoutines
 
 	Description:
 		Retrieves weekly routines of a member.
@@ -388,7 +388,7 @@ GET /getWeeklyRoutines
 
 ---
 
-POST /selectExercise
+POST /members/selectExercise
 
 	Description:
 		Selects an exercise for the specific weekly routine of a member.
@@ -416,7 +416,7 @@ POST /selectExercise
 
 ---
 
-POST /payBill
+POST /members/payBill
 
 	Description:
 		Pays a bill for a specific schedule.
@@ -445,7 +445,7 @@ POST /payBill
 
 ---
 
-GET /getAllMembersByName
+GET /members/getAllMembersByName
 
 	Description:
 		Retrieves all members by their first name and/or last name.
@@ -473,7 +473,7 @@ GET /getAllMembersByName
 
 ---
 
-GET /getMemberInvoice
+GET /members/getMemberInvoice
 
 	Description:
 		Retrieves invoices of a member.
@@ -497,7 +497,7 @@ GET /getMemberInvoice
 
 ---
 
-GET /getMemberSchedule:filterDate
+GET /members/getMemberSchedule:filterDate
 
 	Description:
 		Retrieves the schedule of a member based on the specified date.
@@ -523,7 +523,7 @@ GET /getMemberSchedule:filterDate
 
 ## Trainers
 
-GET /getAllTrainers
+GET /trainers/getAllTrainers
 
 	Description:
 		Retrieves information about all trainers.
@@ -541,7 +541,7 @@ GET /getAllTrainers
 
 ---
 
-GET /getTrainerAvailability
+GET /trainers/getTrainerAvailability
 
 	Description:
 		Retrieves availability of a trainer.
@@ -562,7 +562,7 @@ GET /getTrainerAvailability
 
 ---
 
-GET /getTrainerSchedule/:filterDate
+GET /trainers/getTrainerSchedule/:filterDate
 
 	Description:
 		Retrieves the schedule of a trainer based on the specified date.
@@ -587,7 +587,7 @@ GET /getTrainerSchedule/:filterDate
 
 ---
 
-POST /addAvailability
+POST /trainers/addAvailability
 
 	Description:
 		Adds new availability for a trainer.
@@ -614,7 +614,7 @@ POST /addAvailability
 
 ---
 
-POST /removeAvailability
+POST /trainers/removeAvailability
 
 	Description:
 		Removes availability for a trainer.
@@ -638,7 +638,7 @@ POST /removeAvailability
 
 ---
 
-PUT /updateAvailability
+PUT /trainers/updateAvailability
 
 	Description:
 		Updates availability for a trainer.
@@ -666,7 +666,7 @@ PUT /updateAvailability
 
 ## Admin
 
-GET /getAllRooms
+GET /admin/getAllRooms
 
 	Description:
 		Retrieves information about all rooms.
@@ -687,7 +687,7 @@ GET /getAllRooms
 
 ---
 
-GET /getAllEquipments
+GET /admin/getAllEquipments
 
 	Description:
 		Retrieves information about all equipments in a specific room.
@@ -711,7 +711,7 @@ GET /getAllEquipments
 
 ---
 
-GET /getAllInvoices
+GET /admin/getAllInvoices
 
 	Description:
 		Retrieves information about all invoices.
@@ -732,7 +732,7 @@ GET /getAllInvoices
 
 ---
 
-PUT /updateRoom
+PUT /admin/updateRoom
 
 	Description:
 		Updates the room for a specific schedule.
@@ -757,7 +757,7 @@ PUT /updateRoom
 
 ---
 
-PUT /updateEquipmentStatus
+PUT /admin/updateEquipmentStatus
 
 	Description:
 		Updates the status of a specific equipment.
