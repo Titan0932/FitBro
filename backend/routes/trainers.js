@@ -23,8 +23,7 @@ router.get("/getAllTrainers", async (req, res) => {
         speciality: trainers.speciality,
       })
       .from(trainers)
-      .innerJoin(users)
-      .on(eq(trainers.trainerid, users.userid))
+      .innerJoin(users, eq(trainers.trainerid, users.userid))
       .execute()
       .then((data) => {
         res.status(200).send(data);

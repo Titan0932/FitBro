@@ -193,7 +193,7 @@ router.get("/getAllMembersByName", async (req, res) => {
     // console.log(authHeader)
     const {user_fname, user_lname} = req.body;
     const { user } = req;
-    if(user.role != "admin" || user.role != "trainer"){
+    if((user.role)?.toLowerCase() != "admin" && (user.role)?.toLowerCase() != "trainer"){
       res.status(401).send("Unauthorized access");
       return;
     }
@@ -204,9 +204,9 @@ router.get("/getAllMembersByName", async (req, res) => {
       whereClause = eq(users.f_name, user_fname);
     }else if(user_lname){
       whereClause = eq(users.l_name, user_lname);
-    }else{
-      res.status(400).send("No search criteria provided");
-      return;
+    // }else{
+    //   res.status(400).send("No search criteria provided");
+    //   return;
     }
     const result = await db
       .select({
@@ -216,9 +216,11 @@ router.get("/getAllMembersByName", async (req, res) => {
         user_lname: users.l_name,
         user_email: users.email,
         user_dob: users.user_dob,
+        health_metrics: members.health_metrics
       })
       .from(users)
-      .where(whereClause)
+      .leftJoin(members, eq(users.userid, members.memberid))
+      .where(Object.keys(whereClause).length > 0 && whereClause)
       .then((data) => {
         console.log("DATA: ", data);
         res.status(200).send(data);

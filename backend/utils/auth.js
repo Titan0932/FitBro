@@ -199,6 +199,8 @@ async function checkUserEmailRoleExists(email, role) {
         userCheckError = userRoleErr;
         userExists = false;
       }
+    }else{
+      userExists = false;
     }
   })
   .catch((err) => {

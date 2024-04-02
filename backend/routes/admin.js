@@ -13,7 +13,7 @@ const {
 // get all rooms
 router.get("/getAllRooms", async (req, res) => {
     const { user } = req;
-    if(user.role != "admin"){
+    if(user.role?.toLowerCase() != "admin"){
       res.status(401).send("Unauthorized access");
       return;
     }
@@ -33,14 +33,14 @@ router.get("/getAllRooms", async (req, res) => {
 router.get("/getAllEquipments", async (req, res) => {
     const { roomid } = req.body;
     const { user } = req;
-    if(user.role != "admin"){
+    if(user.role?.toLowerCase() != "admin"){
       res.status(401).send("Unauthorized access");
       return;
     }
     const result = await db
       .select()
       .from(equipments)
-      .where(eq(equipments.roomid, roomid))
+      // .where(eq(equipments.roomid, roomid))
       .execute()
       .then((data) => {
         res.status(200).send(data);
