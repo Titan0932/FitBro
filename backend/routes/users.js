@@ -143,16 +143,17 @@ router.get("/getUserInfo", authMiddleware, async (req, res) => {
 
 router.put("/updateUserInfo", authMiddleware, async (req, res) => {
 
-  const { email, f_name, l_name, user_passw, user_dob, new_passw } = req.body;
+  const { email, f_name, l_name, user_passw, user_dob, new_passw, city, state, phoneno, country } = req.body;
   const { user } = req;
   if (user.email != email) {
     res.status(401).send("Unauthorized access");
     return;
   }
-  const { userAuthError, userInfo } = await authenticateUser(email, user_passw);
-  if (userAuthError?.status) {
-    return res.status(userAuthError.status).send(userAuthError.message);
-  }
+  // If we need user password and email to update info:
+  // const { userAuthError, userInfo } = await authenticateUser(email, user_passw);
+  // if (userAuthError?.status) {
+  //   return res.status(userAuthError.status).send(userAuthError.message);
+  // }
   updateObj = {};
   if (f_name) {
     updateObj.f_name = f_name;
@@ -162,6 +163,18 @@ router.put("/updateUserInfo", authMiddleware, async (req, res) => {
   }
   if (user_dob) {
     updateObj.user_dob = user_dob;
+  }
+  if (city) {
+    updateObj.city = city;
+  }
+  if (state) {
+    updateObj.state = state;
+  }
+  if (phoneno) {
+    updateObj.phoneno = phoneno;
+  }
+  if (country) {
+    updateObj.country = country;
   }
   if (new_passw) {
     const { getHasherr, hashedPw } = await getPwHash(new_passw);
@@ -177,7 +190,7 @@ router.put("/updateUserInfo", authMiddleware, async (req, res) => {
   }
   db.update(users)
     .set(updateObj)
-    .where(eq(users.userid, userInfo.userid))
+    .where(eq(users.userid, user.userid)) //userInfo.userid if auth needed
     .execute()
     .then(() => {
       res.status(200).send("User info updated successfully");
