@@ -6,9 +6,10 @@ import type { User } from '@/types/user';
 import { authClient } from '@/lib/auth/client';
 import { logger } from '@/lib/default-logger';
 import { redirect, useRouter } from 'next/navigation';
-import { setCookie } from 'nookies';
+import { setCookie, parseCookies } from 'nookies';
 import axios from 'axios';
 import { resolve } from 'path';
+
 
 export interface UserContextValue {
   user: User | null;
@@ -28,11 +29,12 @@ export interface UserProviderProps {
 
 export function UserProvider({ children }: UserProviderProps): React.JSX.Element {
   const router = useRouter();
+  const cookies = parseCookies();
   const [state, setState] = React.useState<UserContextValue>({
     user: null,
     error: null,
     isLoading: true,
-    role: "Member",
+    role: cookies.role ?? 'Member',
     updateRole: () => {return new Promise<void>((resolve) => {resolve()})},
     setState: () => {throw new Error('setState function must be overridden');},
   });
@@ -69,7 +71,7 @@ export function UserProvider({ children }: UserProviderProps): React.JSX.Element
        router.refresh();
     }
 
-    if(checkRole){
+    if(checkRole && (state?.role)?.toLowerCase() != (role).toLowerCase()){
       let data = `role=${role}`
       let config = {
         method: 'post',
@@ -80,13 +82,29 @@ export function UserProvider({ children }: UserProviderProps): React.JSX.Element
       };
 
       return await axios.request(config)
-        .then((response:any) => {
-          if(response){
-            setCookie(null, 'role', role, {
-              maxAge: 30 * 24 * 60 * 60, // 30 days
-              path: '/',
-            });
-            setState((prev) => ({ ...prev, role }));
+        .then(async (response:any) => {
+           if(response){
+            const switchConfig = {
+              method: 'post',
+              maxBodyLength: Infinity,
+              url: 'http://localhost:3005/users/switchRoles',
+              data: `newRole=${role}`,
+              headers: {"Authorization": "Bearer " + localStorage.getItem('custom-auth-token')}
+            }
+            await axios.request(switchConfig).then(
+              (switchResponse:any) => {
+                localStorage.setItem('custom-auth-token', switchResponse.data);
+                setCookie(null, 'role', role, {
+                  maxAge: 30 * 24 * 60 * 60,
+                  path: '/',
+                });
+                setState((prev) => ({ ...prev, role }));
+              }
+            ).catch((switchErr) => {
+              console.log("Error: ", switchErr);
+              alert(switchErr?.response?.data ?? switchErr.message)
+              return new Promise<void>((resolve) => {resolve()});
+            })
           }
         })
         .catch((error:any) => {
@@ -94,6 +112,10 @@ export function UserProvider({ children }: UserProviderProps): React.JSX.Element
           alert(error?.response?.data ?? error.message)
         });
     }else{
+      setCookie(null, 'role', role, {
+        maxAge: 30 * 24 * 60 * 60,
+        path: '/',
+      });
       setState((prev) => ({ ...prev, role }));
       return new Promise<void>((resolve) => {resolve()});
     }
