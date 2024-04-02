@@ -11,20 +11,19 @@ const axios = require('axios');
 //   return Array.from(arr, (v) => v.toString(16).padStart(2, '0')).join('');
 // }
 
-const user = {
-  id: '',
-  avatar: '/assets/avatar.png',
-  firstName: '',
-  lastName: '',
-  email: '',
-} satisfies User;
 // const user = {
-//   id: 'USR-000',
+//   id: '',
 //   avatar: '/assets/avatar.png',
-//   firstName: 'Sofia',
-//   lastName: 'Rivers',
-//   email: 'sofia@devias.io',
+//   firstName: '',
+//   lastName: '',
+//   email: '',
+//   dob: '',
+//   phoneno: '',
+//   city: '',
+//   state: '',
+//   country: '',
 // } satisfies User;
+
 
 export interface SignUpParams {
   firstName: string;
@@ -94,7 +93,6 @@ class AuthClient {
       .then((response:any) => {
         console.log(JSON.stringify(response.data));
         localStorage.setItem('custom-auth-token', response.data.jwtToken);
-        user.email = email;
         return {};
       })
       .catch((error:any) => {
@@ -131,7 +129,7 @@ class AuthClient {
     return await axios.request(config)
       .then((response:any) => {
         console.log("User data: ", JSON.stringify(response.data));
-        return {data: user};
+        return {data: response.data};
       })
       .catch((error:any) => {
         console.log("Error: ", error);
