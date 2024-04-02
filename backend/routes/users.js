@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const { eq } = require("drizzle-orm");
+const { format } = require('date-fns');
 
 const {
   authenticateUser,
@@ -39,12 +40,33 @@ router.post("/login", async (req, res) => {
   return res.send(successfulObj);
 });
 
+router.post("/switchRoles", authMiddleware, async (req, res) => {
+  const { user } = req;
+  const { newRole } = req.body;
+  if (!user) {
+    res.status(401).send("Unauthorized access");
+    return;
+  }
+  const { userCheckError, userExists } = await checkUserEmailRoleExists(
+    user.email,
+    newRole
+  );
+
+  if (userExists) {
+    const jwtToken = generateJwtToken(user.email, newRole);
+    return res.status(200).send(jwtToken);
+  }else { //if (userCheckError?.status != 404)
+    return res.status(userCheckError.status).send(userCheckError.message);
+  }
+})
+
+
 router.post("/register", async (req, res) => {
 
   const { email, f_name, l_name, user_passw, user_dob, role } = req.body;
   // console.log("QUERY: " ,req.body)
-  // Query database to insert the new user
-  // code that inserts the new user into the database
+  const formattedDob = format(new Date(user_dob), 'yyyy-MM-dd');
+
   const { checkErr, check } = await checkUserEmailExists(email);
   console.log(checkErr, check);
   if (checkErr?.status) {
@@ -65,7 +87,7 @@ router.post("/register", async (req, res) => {
         user_passw: hashedPw,
         f_name: f_name,
         l_name: l_name,
-        user_dob: user_dob,
+        user_dob: formattedDob,
       })
       .returning({ userid: users.userid })
       .execute();
@@ -85,7 +107,7 @@ router.post("/register", async (req, res) => {
   );
   if (userExists) {
     return res.status(400).send("User already exists");
-  }else if (userCheckError?.status) {
+  }else if (userCheckError?.status != 404) {
     return res.status(userCheckError.status).send(userCheckError.message);
   }
   // Insert user into the appropriate role table
