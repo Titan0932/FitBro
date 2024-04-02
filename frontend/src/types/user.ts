@@ -5,5 +5,9 @@ export interface User {
   avatar?: string;
   email?: string;
   userDOB?: Date;
+  phoneNo?: string;
+  city?: string;
+  state?: string;
+  country?: string;
   [key: string]: unknown;
 }
