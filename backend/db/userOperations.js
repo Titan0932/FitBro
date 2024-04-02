@@ -1,6 +1,6 @@
 
-
-
+const db  = require("../dbConnect");
+const { members, trainers, admins  } = require("../db/schema");
 /**
  * Inserts a user into the appropriate role table based on the provided role.
  * @param {string} role - The role of the user (member, trainer, admin).
@@ -40,4 +40,4 @@ async function insertUserIntoRoleTable(role, userId) {
     }
   }
 
-  module.exports = insertUserIntoRoleTable;
+  module.exports = {insertUserIntoRoleTable};
