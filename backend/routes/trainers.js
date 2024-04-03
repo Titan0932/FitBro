@@ -36,16 +36,11 @@ router.get("/getAllTrainers", async (req, res) => {
   
   // anyone can see the availability for a trainer
 router.get("/getTrainerAvailability", async (req, res) => {
-    const { trainerid } = req.body;
+    const { trainerid } = req.query;
     const { user } = req;
     
     const result = await db
-      .select({
-        availabilityid: trainer_availability.availabilityid,
-        day_of_week: trainer_availability.day_of_week,
-        start_time: trainer_availability.start_time,
-        end_time: trainer_availability.end_time,
-      })
+      .select()
       .from(trainer_availability)
       .where(eq(trainer_availability.trainerid, trainerid))
       .execute()

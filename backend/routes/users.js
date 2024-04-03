@@ -190,9 +190,12 @@ router.put("/updateUserInfo", authMiddleware, async (req, res) => {
   }
   db.update(users)
     .set(updateObj)
-    .where(eq(users.userid, user.userid)) //userInfo.userid if auth needed
+    .where(eq(users.email, user.email)) //userInfo.userid if auth needed
     .execute()
-    .then(() => {
+    .then((response) => {
+      if(response.rowCount == 0){
+        return res.status(404).send("User not found");
+      }
       res.status(200).send("User info updated successfully");
     })
     .catch((err) => {

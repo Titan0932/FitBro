@@ -10,13 +10,13 @@ const {
   classes,
   member_schedule,
   schedules,
-  trainer_schedule
+  trainer_schedule,
+  rooms
 } = require("../db/schema");
 
 //get member schedule
 router.get("/getMemberSchedule", async (req, res) => {
-    const { memberid } = req.body;
-  
+    const { memberid } = req.query;
     const { user } = req;
     
     const result = await db
@@ -26,17 +26,22 @@ router.get("/getMemberSchedule", async (req, res) => {
         start_time: schedules.start_time,
         duration: schedules.duration,
         classid: schedules.classid,
+        className: classes.name,
+        classDescription: classes.description,
+        classType: classes.type,
+        classPrice: classes.price,
         roomid: schedules.roomid,
         trainerid: classes.trainerid,
-        trainer_name: users.f_name.concat(" ").concat(users.l_name)
+        trainerFname: users.f_name,
+        trainerLname: users.l_name,
+        roomName: rooms.name,
+        // trainer_name: users.f_name.concat(" ").concat(users.l_name)
       })
       .from(schedules)
-      .innerJoin(member_schedule)
-      .on(eq(schedules.scheduleid, member_schedule.scheduleid))
-      .innerJoin(classes)
-      .on(eq(schedules.classid, classes.classid))
-      .innerJoin(users)
-      .on(eq(classes.trainerid, users.userid))
+      .innerJoin(member_schedule, eq(schedules.scheduleid, member_schedule.scheduleid))
+      .innerJoin(classes, eq(schedules.classid, classes.classid))
+      .innerJoin(users, eq(classes.trainerid, users.userid))
+      .innerJoin(rooms, eq(schedules.roomid, rooms.roomid))
       .where(eq(member_schedule.memberid, memberid))
       .execute()
       .then((data) => {
@@ -46,7 +51,7 @@ router.get("/getMemberSchedule", async (req, res) => {
         console.log(err);
         res.status(500).send("An error occurred while fetching member schedule");
       })
-})
+})  
 
 //create a schedule
 async function insertSchedule({ classid, roomid, date, start_time, duration, status }) {
@@ -132,13 +137,8 @@ router.post("/createPersonalSchedule", async (req, res) => {
   
 // get a trainer's schedule
 router.get("/getTrainerSchedule", async (req, res) => {
-    const { trainerid } = req.body;
-  
+    const { trainerid } = req.query;
     const { user } = req;
-    if(user.userid != trainerid){
-      res.status(401).send("Unauthorized access");
-      return;
-    }
   
     const result = await db
       .select({
@@ -147,18 +147,17 @@ router.get("/getTrainerSchedule", async (req, res) => {
         start_time: schedules.start_time,
         duration: schedules.duration,
         classid: schedules.classid,
-        class_name: classes.name,
-        class_description: classes.description,
+        className: classes.name,
+        classDescription: classes.description,
         roomid: schedules.roomid,
         trainerid: classes.trainerid,
+        roomName: rooms.name,
       })
       .from(schedules)
-      .innerJoin(trainer_schedule)
-      .on(eq(schedules.scheduleid, trainer_schedule.scheduleid))
-      .innerJoin(classes)
-      .on(eq(schedules.classid, classes.classid))
-      .innerJoin(users)
-      .on(eq(classes.trainerid, users.userid))
+      .innerJoin(trainer_schedule, eq(schedules.scheduleid, trainer_schedule.scheduleid))
+      .innerJoin(classes, eq(schedules.classid, classes.classid))
+      .innerJoin(users, eq(classes.trainerid, users.userid))
+      .innerJoin(rooms, eq(schedules.roomid, rooms.roomid))
       .where(eq(classes.trainerid, trainerid))
       .orderBy(asc(schedules.date), asc(schedules.start_time))
       .execute()
