@@ -15,6 +15,7 @@ import type { NavItemConfig } from '@/types/nav';
 import { paths } from '@/paths';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 import { Logo } from '@/components/core/logo';
+import { Barbell } from '@phosphor-icons/react';
 
 import { trainerNavitems, adminNavitems, memberNavitems } from './config';
 import { navIcons } from './nav-icons';
@@ -54,8 +55,9 @@ export function SideNav(): React.JSX.Element {
       }}
     >
       <Stack spacing={2} sx={{ p: 3 }}>
-        <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-flex' }}>
-          <Logo color="light" height={32} width={122} />
+        <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-flex', textDecoration: 'none' }}>
+          {/* <Logo color="light" height={32} width={122} /> */}
+          <span style={{fontSize: '2rem', textDecoration: 'none', 'color': 'white', }}> <Barbell fill="white" fontSize="2rem" /> FitBro</span>
         </Box>
         <RoleSelect />
       </Stack>

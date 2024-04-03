@@ -21,6 +21,7 @@ import { trainerNavitems, adminNavitems, memberNavitems } from './config';
 import { navIcons } from './nav-icons';
 import { RoleSelect } from '@/components/auth/RoleSelect';
 import { UserContext } from '@/contexts/user-context';
+import { Barbell } from '@phosphor-icons/react';
 
 export interface MobileNavProps {
   onClose?: () => void;
@@ -61,8 +62,9 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
       open={open}
     >
       <Stack spacing={2} sx={{ p: 3 }}>
-        <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-flex' }}>
-          <Logo color="light" height={32} width={122} />
+        <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-flex', textDecoration: 'none' }}>
+          {/* <Logo color="light" height={32} width={122} /> */}
+          <span style={{fontSize: '2rem', textDecoration: 'none', 'color': 'white', }}> <Barbell fill="white" fontSize="2rem" /> FitBro</span>
         </Box>
         <RoleSelect />
       </Stack>
