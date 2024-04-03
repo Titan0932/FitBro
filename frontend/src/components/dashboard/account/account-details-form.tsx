@@ -45,6 +45,7 @@ const axios = require('axios');
 
 export function AccountDetailsForm(): React.JSX.Element {
   const user = React.useContext(UserContext);
+  console.log(user)
   const [isPending, setIsPending] = React.useState<boolean>(false);
   const router = useRouter();
 
@@ -66,6 +67,7 @@ export function AccountDetailsForm(): React.JSX.Element {
       values.country === user?.user?.country
     ){
       setIsPending(false);
+      alert("No changes made");
       return;
     }else{
       let config = {
@@ -80,11 +82,12 @@ export function AccountDetailsForm(): React.JSX.Element {
         if(response){
           console.log("Updated user info: ", response.data);
           user?.setState((prev) => ({ ...prev, user: values }));
+          alert("User info updated successfully");
         }
       })
       .catch((error:any) => {
         console.log("Error: ", error);
-        // alert(error?.response?.data ?? error.message)
+        alert(error?.response?.data ?? error.message)
       })
       setIsPending(false);
       router.refresh();
