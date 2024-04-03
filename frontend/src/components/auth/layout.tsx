@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 
 import { paths } from '@/paths';
 import { DynamicLogo } from '@/components/core/logo';
+import { Barbell } from '@phosphor-icons/react/dist/ssr/Barbell';
 
 export interface LayoutProps {
   children: React.ReactNode;
@@ -23,8 +24,9 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
     >
       <Box sx={{ display: 'flex', flex: '1 1 auto', flexDirection: 'column' }}>
         <Box sx={{ p: 3 }}>
-          <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-block', fontSize: 0 }}>
-            <DynamicLogo colorDark="light" colorLight="dark" height={32} width={122} />
+          <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-block', fontSize: 0, textDecoration: "none" }}>
+            <span style={{fontSize: '2rem', textDecoration: 'none', 'color': 'black', }}> <Barbell fill="#635bff" fontSize="2rem" /> FitBro</span>
+            {/* <DynamicLogo colorDark="light" colorLight="dark" height={32} width={122} /> */}
           </Box>
         </Box>
         <Box sx={{ alignItems: 'center', display: 'flex', flex: '1 1 auto', justifyContent: 'center', p: 3 }}>
@@ -46,11 +48,11 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
             <Typography color="inherit" sx={{ fontSize: '24px', lineHeight: '32px', textAlign: 'center' }} variant="h1">
               Welcome to{' '}
               <Box component="span" sx={{ color: '#15b79e' }}>
-                FitZone
+                FitBro
               </Box>
             </Typography>
             <Typography align="center" variant="subtitle1">
-              A place to manage your Fitness Needs!
+              A Bro to manage your Fitness Needs!
             </Typography>
           </Stack>
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
