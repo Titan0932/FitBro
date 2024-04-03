@@ -7,6 +7,7 @@ import type { Metadata } from 'next';
 
 import { config } from '@/config';
 import { MemberTable } from '@/components/dashboard/members/Members';
+import { CustomersFilters } from '@/components/dashboard/customer/customers-filters';
 
 const metadata = { title: `Trainers | Dashboard | ${config.site.name}` } satisfies Metadata;
 
@@ -14,6 +15,14 @@ const axios = require('axios');
 
 export default function Page(): React.JSX.Element {
   const [members, setMembers] = React.useState([]);
+  const [filteredMembers, setFileredMembers] = React.useState([]);
+
+  const filterMembers = (queryName: string) => {
+    const filteredMembers = members.filter((member: any) => {
+      return member.user_fname.toLowerCase().includes(queryName.toLowerCase()) || member.user_lname.toLowerCase().includes(queryName.toLowerCase());
+    });
+    setFileredMembers(filteredMembers);
+  }
 
   React.useEffect(() => {
     (async () => {
@@ -30,6 +39,7 @@ export default function Page(): React.JSX.Element {
         .then((response:any) => {
           // console.log(JSON.stringify(response.data));
           setMembers(response.data)
+          setFileredMembers(response.data);
           return {};
         })
         .catch((error:any) => {
@@ -37,12 +47,12 @@ export default function Page(): React.JSX.Element {
           return {error: error?.response?.data ?? error.message}
         });
       })();
-
   },[])
   
   return (
     <>
-      <MemberTable rows={members} />
+      <CustomersFilters filterMembers={filterMembers} />
+      <MemberTable rows={filteredMembers} />
     </>
   );
 }
