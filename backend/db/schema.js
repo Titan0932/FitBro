@@ -4,7 +4,7 @@ const { serial, text, integer, date, decimal, time, pgTable } = require('drizzle
 
 const users = pgTable('users', {
   userid: serial('userid').primaryKey(),
-  email: text('email').notNull(),
+  email: text('email').notNull().unique(),
   f_name: text('f_name').notNull(),
   l_name: text('l_name').notNull(),
   user_passw: text('user_passw').notNull(),
@@ -39,11 +39,11 @@ const fitness_goals = pgTable('fitness_goals', {
   });
   
   const trainer_availability = pgTable('trainer_availability', {
-    availabilityid: serial('availabilityid').primaryKey(),
+    availabilityid: serial('availabilityid').unique(),
     trainerid: integer('trainerid').references(trainers.trainerid),
-    date: date('date'),
-    start_time: time('start_time'),
-    end_time: time('end_time'),
+    date: date('date').notNull(),
+    start_time: time('start_time').notNull(),
+    end_time: time('end_time').notNull(),
   });
   
   const admins = pgTable('admins', {
@@ -92,11 +92,11 @@ const fitness_goals = pgTable('fitness_goals', {
   });
   
   const invoices = pgTable('invoices', {
-    invoiceid: serial('invoiceid').primaryKey(),
-    memberid: integer('memberid').references(members.memberid),
+    invoiceid: serial('invoiceid').unique(),
+    memberid: integer('memberid').references(members.memberid).primaryKey(),
     amount: decimal('amount').notNull(),
     date: date('date').notNull(),
-    scheduleid: integer('scheduleid').references(schedules.scheduleid),
+    scheduleid: integer('scheduleid').references(schedules.scheduleid).primaryKey(),
     status: text('status').notNull(),
   });
 

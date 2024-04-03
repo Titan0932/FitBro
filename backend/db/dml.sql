@@ -35,10 +35,10 @@ insert into rooms(name) values('Room 1');
 insert into rooms(name) values('Room 2');
 insert into rooms(name) values('Room 3');
 
-insert into schedules(roomID, classID, date ,start_time, duration, status) values(3, 1, '2024-04-11' ,'08:00:00', 2, "COMPLETE");
-insert into schedules(roomID, classID, date ,start_time, duration, status) values(3, 1, '2024-04-11' ,'10:00:00', 2, "COMPLETE");
-insert INTO schedules(roomID, classID, date ,start_time, duration, status) values(2, 1, '2024-04-11' ,'12:00:00', 2, "COMPLETE");
-insert into schedules(roomID, classID, date ,start_time, duration, status) values(1, 2, '2024-04-11' ,'14:00:00', 2, "COMPLETE");
+insert into schedules(roomID, classID, date ,start_time, duration, status) values(3, 1, '2024-04-11' ,'08:00:00', 2, 'COMPLETE');
+insert into schedules(roomID, classID, date ,start_time, duration, status) values(3, 1, '2024-04-11' ,'10:00:00', 2, 'COMPLETE');
+insert INTO schedules(roomID, classID, date ,start_time, duration, status) values(2, 1, '2024-04-11' ,'12:00:00', 2, 'COMPLETE');
+insert into schedules(roomID, classID, date ,start_time, duration, status) values(1, 2, '2024-04-11' ,'14:00:00', 2, 'COMPLETE');
 
 insert into trainer_schedule(trainerID, scheduleID) values(3, 1);
 insert into trainer_schedule(trainerID, scheduleID) values(3, 2);

@@ -10,7 +10,7 @@ CREATE TABLE users(
     city TEXT,
     country TEXT,
     phoneNo TEXT,
-    state TEXT,
+    state TEXT
 );
 
 CREATE TABLE members(
@@ -37,11 +37,12 @@ CREATE TABLE trainers(
 );
 
 CREATE TABLE trainer_availability (
-    availabilityId SERIAL PRIMARY KEY,
+    availabilityId SERIAL UNIQUE,
     trainerID INTEGER REFERENCES trainers(trainerID),
-    date DATE, -- specific date of availability
-    start_time TIME,
-    end_time TIME
+    date DATE Not NULL, -- specific date of availability
+    start_time TIME Not NULL,
+    end_time TIME Not NULL,
+    CONSTRAINT unique_availability UNIQUE (trainerID, date)
 );
 
 CREATE TABLE admins(
