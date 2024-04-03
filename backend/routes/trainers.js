@@ -84,12 +84,9 @@ router.get("getTrainerSchedule/:filterDate", async (req, res) => {
 // TODO: Post requests for trainer stuffs
   // add new availability
 router.post('/addAvailability', async (req, res) => {
-  const {curuser} = req.user;
+  const curuser = req.user;
   const {date, start_time, end_time, trainerid} = req.body; 
-  if(curuser.role != "trainer" && curuser.userid != trainerid){
-    res.status(401).send("Unauthorized access");
-    return;
-  }
+  
   const result = await db
     .insert(trainer_availability)
     .values({
@@ -104,7 +101,7 @@ router.post('/addAvailability', async (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).send(err);
+      res.status(500).send(err.detail);
     });
 })
 
@@ -112,13 +109,9 @@ router.post('/addAvailability', async (req, res) => {
   router.post("/removeAvailability", async (req, res) => {
     const {curuser} = req.user;
     const {availabilityid} = req.body
-    if(curuser.role != "trainer" && curuser.userid != trainerid){
-      res.status(401).send("Unauthorized access");
-      return;
-    }
+
     const result = await db
-      .delete()
-      .from(trainer_availability)
+      .delete(trainer_availability)
       .where(eq(trainer_availability.availabilityid, availabilityid))
       .execute()
       .then((data) => {
