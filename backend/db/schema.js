@@ -41,7 +41,7 @@ const fitness_goals = pgTable('fitness_goals', {
   const trainer_availability = pgTable('trainer_availability', {
     availabilityid: serial('availabilityid').primaryKey(),
     trainerid: integer('trainerid').references(trainers.trainerid),
-    date: integer('date'),
+    date: date('date'),
     start_time: time('start_time'),
     end_time: time('end_time'),
   });
