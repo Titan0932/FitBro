@@ -1,6 +1,8 @@
 
 const db  = require("../dbConnect");
-const { members, trainers, admins  } = require("../db/schema");
+const { members, trainers, admins, users  } = require("../db/schema");
+const {eq} =  require('drizzle-orm')
+
 /**
  * Inserts a user into the appropriate role table based on the provided role.
  * @param {string} role - The role of the user (member, trainer, admin).
@@ -40,4 +42,25 @@ async function insertUserIntoRoleTable(role, userId) {
     }
   }
 
-  module.exports = {insertUserIntoRoleTable};
+
+// get user's userid using email
+async function getid(email){
+   return await db.select({id: users.userid})
+            .from(users)
+            .where(eq(users.email, email ))
+            .execute()
+            .then((response) => {
+              if(response.length == 0 ){
+                return -1;
+              }else{
+                console.log(response[0].id)
+                return response[0].id;
+              }
+            })
+            .catch(error => {
+              console.log(error)
+              return -1;
+            })
+}
+
+module.exports = {insertUserIntoRoleTable, getid};
