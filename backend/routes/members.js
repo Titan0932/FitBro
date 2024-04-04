@@ -12,18 +12,76 @@ const {
   member_exercises,
   invoices,
   schedules,
+  exercises
 } = require("../db/schema");
+
+const {getid} = require('../db/userOperations')
+
+router.put("/updateFitnessGoal", async (req, res) => {
+    const { memberid, goalid, status, completeDate } = req.body;
+    const { user } = req;
+    const curUserid = await getid(user.email)
+    console.log("REQ: ", req.body)
+    if(curUserid != memberid){
+      res.status(401).send("Unauthorized access");
+      return;
+    }
+    const toUpdate= {
+        status: status,
+        achieved_date: completeDate == '' ? null : completeDate
+      }
+    const result = await db
+      .update(fitness_goals)
+      .set(toUpdate)
+      .where(eq(fitness_goals.goalid, goalid))
+      .execute()
+      .then(() => {
+        res.status(200).send("Fitness goal updated successfully");
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("An error occurred while updating fitness goal");
+      });
+})
+
+router.post("/addFitnessGoal", async (req, res) => {
+    const { memberid, goal_title, goal_description, goal_value, target_date } = req.body;
+    const { user } = req;
+    const curUserid = await getid(user.email)
+    if(curUserid != memberid){
+      res.status(401).send("Unauthorized access");
+      return;
+    }
+    const result = await db
+      .insert(fitness_goals)
+      .values({
+        memberid: memberid,
+        goal_title: goal_title,
+        goal_description: goal_description,
+        goal_value: goal_value,
+        target_date: target_date,
+        status: "incomplete",
+      })
+      .execute()
+      .then(() => {
+        res.status(200).send("Fitness goal added successfully");
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("An error occurred while adding fitness goal");
+      });
+})
+
 
 // to get member's incomplete fitness goals
 router.get("/getFitnessGoals/:status", async (req, res) => {
-    const { memberid } = req.body;
+    const { memberid } = req.query;
     const { status } = req.params;
-  
     const { user } = req;
-    
-    if(user.userid != memberid){
-      res.status(401).send("Unauthorized access");
-      return;
+
+    const curUserid = await getid(user.email)
+    if(curUserid != memberid){
+      return res.status(401).send("Unauthorized Access!");
     }
   
     let whereClause;
@@ -54,11 +112,13 @@ router.get("/getFitnessGoals/:status", async (req, res) => {
   
   // get member's health metrics
 router.get("/getHealthMetrics", async (req, res) => {
-    const { memberid } = req.body;
+    const { memberid } = req.query;
   
     const { user } = req;
-  
-    if(user.userid != memberid){
+
+    const curUserid = await getid(user.email);
+
+    if(curUserid != memberid){
       res.status(401).send("Unauthorized access");
       return;
     }
@@ -76,12 +136,38 @@ router.get("/getHealthMetrics", async (req, res) => {
         res.status(500).send("An error occurred while fetching health metrics");
       });
 })
+
+router.put("/updateHealthMetrics", async (req, res) => {
+    const { memberid, height, weight } = req.body;
+    const { user } = req;
+    const curUserid = await getid(user.email)
+
+    if(curUserid != memberid){
+      res.status(401).send("Unauthorized access");
+      return;
+    }
+    const result = await db
+      .update(members)
+      .set({
+        height: height,
+        weight: weight,
+      })
+      .where(eq(members.memberid, memberid))
+      .execute()
+      .then(() => {
+        res.status(200).send("Health metrics updated successfully");
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("An error occurred while updating health metrics");
+      });
+})
   
 router.get("/getWeeklyRoutines", async (req, res) => {
-    const { memberid } = req.body;
+    const { memberid } = req.query;
     const { user } = req;
-    
-    if(user.userid != memberid){
+    const curUserid = await getid(user.email)
+    if(curUserid != memberid){
       res.status(401).send("Unauthorized access");
       return;
     }
@@ -90,6 +176,7 @@ router.get("/getWeeklyRoutines", async (req, res) => {
       .select()
       .from(member_exercises)
       .where(eq(member_exercises.memberid, memberid))
+      .innerJoin(exercises, eq(member_exercises.exerciseid, exercises.exerciseid))
       .execute()
       .then((data) => {
         res.status(200).send(data);
@@ -98,18 +185,35 @@ router.get("/getWeeklyRoutines", async (req, res) => {
         console.log(err);
         res.status(500).send("An error occurred while fetching weekly routines");
       });
-  
+})
+
+router.get("/getExcersises", async (req, res) => {
+    const { user } = req;
+    
+    const result = await db
+      .select()
+      .from(exercises)
+      .execute()
+      .then((data) => {
+        res.status(200).send(data);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("An error occurred while fetching weekly routines");
+      });
 })
   
   // TODO: Updating member stuffs: Post requests
   
   // select an exercise for the specific weekly routine
 router.post("/selectExercise", async (req, res) => {
-    const { memberid, exerciseid, week_date, rep, weight } = req.body;
+    const { memberid, exerciseid, start_week, reps, weight } = req.body;
   
     const { user } = req;
+
+    const curUserid = await getid(user.email)
   
-    if(user.userid != memberid){
+    if(curUserid != memberid){
       res.status(401).send("Unauthorized access");
       return;
     }
@@ -119,8 +223,8 @@ router.post("/selectExercise", async (req, res) => {
       .values({
         memberid: memberid,
         exerciseid: exerciseid,
-        week_date: week_date,
-        reps: rep,
+        start_week: start_week,
+        reps: reps,
         weight: weight,
       })
       .execute()
@@ -216,7 +320,8 @@ router.get("/getAllMembersByName", async (req, res) => {
         user_lname: users.l_name,
         user_email: users.email,
         user_dob: users.user_dob,
-        health_metrics: members.health_metrics
+        weight: members.weight,
+        height: members.height,
       })
       .from(users)
       .leftJoin(members, eq(users.userid, members.memberid))
