@@ -15,7 +15,9 @@ CREATE TABLE users(
 
 CREATE TABLE members(
     memberID INTEGER PRIMARY KEY REFERENCES users(userID),
-    health_metrics TEXT
+    height DECIMAL,
+    weight DECIMAL
+    -- health_metrics TEXT
 );
 
 CREATE TABLE fitness_goals(

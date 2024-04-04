@@ -1,11 +1,11 @@
 
 
-Insert into users(email, f_name, l_name, user_passw, user_dob) values('johndoe@test.com','John','Doe','j$2b$10$A63RoL1ZRrV7lPuJkrCW5Oef5Ta8umet0tuO4Gux1YbI47xcRXdd2','1990-01-01'); /* password */
-Insert into members(memberID, health_metrics) values(1, 'weight: 79, height: 6ft');
-Insert into fitness_goals(memberID, goal_title, goal_value, target_date, status) values(1, 'Weight Loss', '65', '2024-12-31', 'to-do');
+Insert into users(email, f_name, l_name, user_passw, user_dob) values('johndoe@test.com','John','Doe','$2b$10$ki/l9ZwMlppeiIdTSX3dQ.qznTZm2u8BTNrGG7a9Pl9SiIReFPuYm','1990-01-01'); /* password */
+Insert into members(memberID, height, weight) values(1, 6, 79);
+Insert into fitness_goals(memberID, goal_title, goal_value, target_date, status) values(1, 'Weight Loss', '65', '2024-12-31', 'incomplete');
 
 Insert into users(email, f_name, l_name, user_passw, user_dob) values('sarahFowler@test.com', 'Sarah', 'Fowler', '$2b$10$MRFdzIjjxc2k8aesAeLgOuWjaQMeDXLnU56OHx0P15QXzurz.51va', '1991-01-01'); /* password1 */
-Insert into members(memberID, health_metrics) values(2, 'weight: 59, height: 5.6ft');
+Insert into members(memberID, height, weight) values(2, 5.6, 59);
 
 Insert into users(email, f_name, l_name, user_passw, user_dob) values('jasonThompson@test.com', 'Jason', 'Thompson', '$2b$10$dnwJE2pwLpKLSzTUgZpHoOLCrE10tSNwWjztLSFrur.UM7qhFE8Rm', '1992-01-01');/* password2 */
 insert into trainers(trainerID, speciality) values(3, ARRAY['yoga', 'pilates']);
@@ -61,5 +61,9 @@ insert into invoices(memberID, amount, date, scheduleID, status) values(1, 20, '
 insert into invoices(memberID, amount, date, scheduleID, status) values(2, 20, '2024-04-09', 2, 'paid');
 insert into invoices(memberID, amount, date, scheduleID, status) values(2, 50, '2024-04-09', 4, 'paid');
 
+insert into exercises(name, description, type) values('Squats', 'Squat down and get back up. Legs shoulder width apart.', 'legs, glutes');
+insert into exercises(name, description, type) values('Pushups', 'Get down on the floor and push yourself up.', 'chest, triceps');
+insert into exercises(name, description, type) values('Deadlifts', 'Lift the barbell from the floor to your hips.', 'back, legs');
 
-
+insert into member_exercises(memberID, exerciseID, reps, weight, start_week) values(1, 1, 12, 50, '2024-04-09');
+insert into member_exercises(memberID, exerciseID, reps, weight, start_week) values(1, 2, 12, 0, '2024-04-09');

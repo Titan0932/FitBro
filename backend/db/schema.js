@@ -17,7 +17,8 @@ const users = pgTable('users', {
 
 const members = pgTable('members', {
   memberid: integer('memberid').primaryKey().references(users.userid),
-  health_metrics: text('health_metrics'),
+  height: decimal('height'),
+  weight: decimal('weight')
 });
 
 
