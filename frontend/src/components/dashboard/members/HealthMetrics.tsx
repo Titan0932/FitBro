@@ -21,7 +21,7 @@ export const HealthMetrics = () => {
         }
         await axios.request(config)
             .then((response: any) => {
-                console.log("Health Metrics: ", JSON.stringify(response.data));
+                // console.log("Health Metrics: ", JSON.stringify(response.data));
                 setWeight(response.data[0].weight);
                 setHeight(response.data[0].height);
             })
@@ -36,8 +36,6 @@ export const HealthMetrics = () => {
         getHealthMetrics();
     }, []);
 
-    console.log("Weight: ", weight);
-    console.log("Height: ", height);
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();

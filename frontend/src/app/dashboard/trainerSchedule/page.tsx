@@ -7,8 +7,10 @@ import {
   Avatar,
   Button,
   Card,
+  CardActions,
   CardContent,
   CardHeader,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -52,7 +54,7 @@ export default function Page(): React.JSX.Element {
     await axios
       .request(apiConfig)
       .then((response: any) => {
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
         setSchedule(response.data);
         return {};
       })
@@ -74,7 +76,7 @@ export default function Page(): React.JSX.Element {
     await axios
       .request(apiConfig)
       .then((response: any) => {
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
         setAvailability(response.data);
         return {};
       })
@@ -139,6 +141,9 @@ const TrainerSchedule = ({ schedule }: { schedule: never[] }) => {
                     Room Name: {item.roomName}
                   </Typography>
                 </CardContent>
+                <CardActions>
+                  <Button> <Chip label={item.status} color={item.status == "CONFIRMED"? "success" : "error"} size='small' /> </Button>
+                </CardActions>
               </Card>
             </Grid>
           ))}

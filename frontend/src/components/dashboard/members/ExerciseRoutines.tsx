@@ -41,7 +41,7 @@ export const ExcerciseRoutines = () => {
 
         await axios(config)
         .then((response: any) => {
-            console.log(response.data);
+            // console.log(response.data);
             setExerciseList(response.data)
         })
         .catch((error: any) => {
