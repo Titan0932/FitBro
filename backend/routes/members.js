@@ -242,15 +242,15 @@ router.post("/payBill", async (req, res) => {
     const { memberid, scheduleid, paidAmount } = req.body;
   
     const { user } = req;
-    if(user.userid != memberid){
+    const curUserid = await getid(user.email)
+    if(curUserid != memberid){
       res.status(401).send("Unauthorized access");
       return;
     }
   
     await db.select({price : classes.price})
     .from(schedules)
-    .innerJoin(classes)
-    .on(eq(schedules.classid, classes.classid))
+    .innerJoin(classes, eq(schedules.classid, classes.classid))
     .where(eq(schedules.scheduleid, scheduleid))
     .execute()
     .then((data) => {
@@ -271,8 +271,8 @@ router.post("/payBill", async (req, res) => {
       })
       .execute()
       .then(async () => {
-        await db.set(schedules)
-                .values({status: "booked"})
+        await db.update(schedules)
+                .set({status: "CONFIRMED"})
                 .where(eq(schedules.scheduleid, scheduleid))
                 .execute()
                 .then(() => {
