@@ -23,6 +23,7 @@ insert into trainer_availability(trainerID, date, start_time, end_time) values(4
 insert into trainer_availability(trainerID, date, start_time, end_time) values(4, '2024-04-22' ,'08:00:00', '16:00:00');
 
 insert into classes(name, description, type, trainerID, price) values('Yoga', 'Yoga for beginners', 'group', 3, 20);
+insert into classes(name, description, type, trainerID, price) values('Personal Training', 'Strength Training', 'personal', 3, 50);
 insert into classes(name, description, type, trainerID, price) values('Personal Training', 'Pilates Training', 'personal', 4, 50);
 
 insert into users(email, f_name, l_name, user_passw, user_dob) values('margieThatcher@test.com', 'Margie', 'Thatcher', '$2b$10$cjqNt4B37StS14Bbx/OGXew3cm4luQyQ.o2a2kiEPHK20ni3G7kGu', '1993-01-01'); /* password3 */
@@ -35,10 +36,10 @@ insert into rooms(name) values('Room 1');
 insert into rooms(name) values('Room 2');
 insert into rooms(name) values('Room 3');
 
-insert into schedules(roomID, classID, date ,start_time, duration, status) values(3, 1, '2024-04-11' ,'08:00:00', 2, 'COMPLETE');
-insert into schedules(roomID, classID, date ,start_time, duration, status) values(3, 1, '2024-04-11' ,'10:00:00', 2, 'COMPLETE');
-insert INTO schedules(roomID, classID, date ,start_time, duration, status) values(2, 1, '2024-04-11' ,'12:00:00', 2, 'COMPLETE');
-insert into schedules(roomID, classID, date ,start_time, duration, status) values(1, 2, '2024-04-11' ,'14:00:00', 2, 'COMPLETE');
+insert into schedules(roomID, classID, date ,start_time, duration, status) values(3, 1, '2024-04-11' ,'08:00:00', 2, 'CONFIRMED');
+insert into schedules(roomID, classID, date ,start_time, duration, status) values(3, 1, '2024-04-11' ,'10:00:00', 2, 'CONFIRMED');
+insert INTO schedules(roomID, classID, date ,start_time, duration, status) values(2, 1, '2024-04-11' ,'12:00:00', 2, 'CONFIRMED');
+insert into schedules(roomID, classID, date ,start_time, duration, status) values(1, 2, '2024-04-11' ,'14:00:00', 2, 'CONFIRMED');
 
 insert into trainer_schedule(trainerID, scheduleID) values(3, 1);
 insert into trainer_schedule(trainerID, scheduleID) values(3, 2);

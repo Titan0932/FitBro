@@ -84,12 +84,12 @@ const fitness_goals = pgTable('fitness_goals', {
   
   const member_schedule = pgTable('member_schedule', {
     memberid: integer('memberid').primaryKey().references(members.memberid),
-    scheduleid: integer('scheduleid').references(schedules.scheduleid),
+    scheduleid: integer('scheduleid').references(() => schedules.scheduleid, { onDelete: 'cascade' }),
   });
   
   const trainer_schedule = pgTable('trainer_schedule', {
     trainerid: integer('trainerid').primaryKey().references(trainers.trainerid),
-    scheduleid: integer('scheduleid').references(schedules.scheduleid),
+    scheduleid: integer('scheduleid').references(() => schedules.scheduleid, { onDelete: 'cascade' }),
   });
   
   const invoices = pgTable('invoices', {

@@ -1,4 +1,3 @@
-CREATE DATABASE FITBRO;
 
 CREATE TABLE users(
     userID SERIAL PRIMARY KEY,
@@ -84,13 +83,13 @@ CREATE TABLE schedules(
 
 CREATE TABLE member_schedule(
     memberID INTEGER REFERENCES members(memberID),
-    scheduleID INTEGER REFERENCES schedules(scheduleID),
+    scheduleID INTEGER REFERENCES schedules(scheduleID) ON DELETE CASCADE,
     PRIMARY KEY (memberID, scheduleID)
 );
 
 CREATE TABLE trainer_schedule(
     trainerID INTEGER REFERENCES trainers(trainerID),
-    scheduleID INTEGER REFERENCES schedules(scheduleID),
+    scheduleID INTEGER REFERENCES schedules(scheduleID) ON DELETE CASCADE,
     PRIMARY KEY (trainerID, scheduleID)
 );
 
