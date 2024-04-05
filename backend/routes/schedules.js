@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { eq, asc } = require("drizzle-orm");
+const { eq, asc, and, not } = require("drizzle-orm");
 
 
 const db = require("../dbConnect");
@@ -11,14 +11,23 @@ const {
   member_schedule,
   schedules,
   trainer_schedule,
-  rooms
+  rooms,
+  invoices
 } = require("../db/schema");
+
+const { getid } = require("../db/userOperations");
 
 //get member schedule
 router.get("/getMemberSchedule", async (req, res) => {
-    const { memberid } = req.query;
+    const { memberid, status='' } = req.query;
     const { user } = req;
-    
+    let whereClause;
+    if(status){
+      whereClause = and(eq(member_schedule.memberid, memberid), eq(schedules.status, status));
+    }else{
+      whereClause = and(eq(member_schedule.memberid, memberid), not(eq(schedules.status, "CANCELLED")));
+    }
+
     const result = await db
       .select({
         scheduleid: schedules.scheduleid,
@@ -35,6 +44,8 @@ router.get("/getMemberSchedule", async (req, res) => {
         trainerFname: users.f_name,
         trainerLname: users.l_name,
         roomName: rooms.name,
+        status: schedules.status,
+        paid: invoices.status
         // trainer_name: users.f_name.concat(" ").concat(users.l_name)
       })
       .from(schedules)
@@ -42,7 +53,8 @@ router.get("/getMemberSchedule", async (req, res) => {
       .innerJoin(classes, eq(schedules.classid, classes.classid))
       .innerJoin(users, eq(classes.trainerid, users.userid))
       .innerJoin(rooms, eq(schedules.roomid, rooms.roomid))
-      .where(eq(member_schedule.memberid, memberid))
+      .innerJoin(invoices, eq(schedules.scheduleid, invoices.scheduleid))
+      .where(whereClause)
       .execute()
       .then((data) => {
         res.status(200).send(data);
@@ -53,15 +65,38 @@ router.get("/getMemberSchedule", async (req, res) => {
       })
 })  
 
+router.delete("/deletePersonalClass", async (req, res) => {
+    const { memberid, scheduleid } = req.query;
+    const { user } = req;
+    const curUserid = await getid(user.email);
+    
+    if( (user.role == "member" && curUserid == memberid) || user.role == "admin"){
+      await db.update(schedules)
+              .set({ status: "CANCELLED" })
+              .where(eq(schedules.scheduleid, scheduleid))
+              .execute()
+              .then(() => {
+                res.status(200).send("Schedule deleted successfully");
+              })
+              .catch((err) => {
+                console.log(err);
+                res.status(500).send("An error occurred while deleting schedule");
+              })
+    }
+    else{
+      return res.status(401).send("Unauthorized access");
+    }
+})
+
 //create a schedule
-async function insertSchedule({ classid, roomid, date, start_time, duration, status }) {
+async function insertSchedule( classid, roomid, date, start_time, duration, status ) {
     return await db.insert(schedules)
       .values({ classid, roomid, date, start_time, duration, status })
       .returning({ scheduleid: schedules.scheduleid })
       .execute();
 }
   
-async function insertTrainerSchedule({ trainerid, scheduleid }) {
+async function insertTrainerSchedule( trainerid, scheduleid ) {
     return await db.insert(trainer_schedule)
       .values({ trainerid, scheduleid })
       .execute();
@@ -96,35 +131,37 @@ router.post("/createGroupSchedule", async (req, res) => {
 })
   
 router.post("/createPersonalSchedule", async (req, res) => {
-    const { id, classid, roomid, date, start_time, type ,duration, status="pending", trainerid } = req.body;
+    const { memberid, classid, roomid, date, start_time ,duration, status="pending", trainerid } = req.body;
     const { user } = req;
-  
-    if(type == "personal" && user.role == "member"){
+    const curUserid = await getid(user.email);
+    
+    if( (user.role == "member" && curUserid == memberid) || user.role == "admin"){
       await insertSchedule(classid, roomid, date, start_time, duration, status)
               .then(async (data) => {
-                await insertTrainerSchedule(trainerid, data.scheduleid)
-                  .then(() => {
+                await insertTrainerSchedule(trainerid, data[0].scheduleid)
+                  .then(async() => {
                     console.log("Trainer schedule created successfully");
+
+                    await db.insert(member_schedule)
+                      .values({memberid: memberid, scheduleid: data[0].scheduleid})
+                      .execute()
+                      .then(() => {
+                        console.log("Member schedule created successfully");
+                        return
+                      })
+                      .catch((err) => {
+                        console.log(err);
+                        res.status(500).send("An error occurred while creating member schedule");
+                        return;
+                      })
+      
+                    return res.status(200).send(data[0]);
                   })
                   .catch((err) => {
                     console.log(err);
                     res.status(500).send("An error occurred while creating trainer schedule");
                     return;
                   })
-                
-                await db.insert(member_schedule)
-                  .values({memberid: id, scheduleid: data.scheduleid})
-                  .execute()
-                  .then(() => {
-                    console.log("Member schedule created successfully");
-                  })
-                  .catch((err) => {
-                    console.log(err);
-                    res.status(500).send("An error occurred while creating member schedule");
-                    return;
-                  })
-  
-                return res.status(200).send("Schedule created successfully");
               })
               .catch((err) => {
                 console.log(err);
@@ -132,14 +169,26 @@ router.post("/createPersonalSchedule", async (req, res) => {
                 return;
               })
     }
-    return req.status(401).send("Unauthorized access");
+    else{
+      return res.status(401).send("Unauthorized access");
+    }
 })
   
 // get a trainer's schedule
 router.get("/getTrainerSchedule", async (req, res) => {
-    const { trainerid } = req.query;
+    const { trainerid, date, status='' } = req.query;
     const { user } = req;
-  
+    let whereClause;
+    if(date){
+      whereClause = and(eq(schedules.date, date), eq(classes.trainerid, trainerid));
+    }else{
+      whereClause = eq(classes.trainerid, trainerid);
+    }
+    if(status){
+      whereClause = and(whereClause, eq(schedules.status, status));
+    }else{
+      whereClause = and(whereClause, not(eq(schedules.status, "CANCELLED")));
+    }
     const result = await db
       .select({
         scheduleid: schedules.scheduleid,
@@ -152,14 +201,15 @@ router.get("/getTrainerSchedule", async (req, res) => {
         roomid: schedules.roomid,
         trainerid: classes.trainerid,
         roomName: rooms.name,
+        status: schedules.status
       })
       .from(schedules)
       .innerJoin(trainer_schedule, eq(schedules.scheduleid, trainer_schedule.scheduleid))
       .innerJoin(classes, eq(schedules.classid, classes.classid))
       .innerJoin(users, eq(classes.trainerid, users.userid))
       .innerJoin(rooms, eq(schedules.roomid, rooms.roomid))
-      .where(eq(classes.trainerid, trainerid))
-      .orderBy(asc(schedules.date), asc(schedules.start_time))
+      .where(whereClause)
+      .orderBy(asc(schedules.date))
       .execute()
       .then((data) => {
         res.status(200).send(data);
