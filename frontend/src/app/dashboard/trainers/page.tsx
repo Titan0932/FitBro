@@ -15,10 +15,63 @@ const axios = require('axios');
 
 export default function Page(): React.JSX.Element {
   const [trainers, setTrainers] = React.useState([]);
+  const [trainerAvails, setTrainerAvails] = React.useState({}); // [trainerid, [avail1, avail2, ...]
+  const [personalClasses, setPersonalClasses] = React.useState({});
 
-  React.useEffect(() => {
-    (async () => {
-      let data = ``
+  
+  const getPersonalClasses = async(trainerid: string) => {
+    console.log("Trainerid: ", trainerid)
+    const apiConfig = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: 'http://localhost:3005/classes/getAllClasses',
+      params: {trainerid: trainerid, type: "personal"},
+      headers: {"Authorization": "Bearer " + localStorage.getItem('custom-auth-token')}
+    }
+    await axios.request(apiConfig)
+            .then((response:any) => {
+              console.log("personal classes: ", response.data);
+              setPersonalClasses((prev: any) => {
+                return {...prev, [trainerid]: response.data[0]}  // assuming only one personal class per trainer
+              })
+              response?.data?.length > 0 ? 
+              getTrainerAvails(trainerid)
+            : 
+              setTrainerAvails((prev: any) => {
+                return { ...prev, [trainerid]: [] };
+              });
+            })
+            .catch((error:any) => {
+              console.log("Error: ", error);
+              alert(error?.response?.data.message ?? error.message)
+            })
+
+  }
+
+  const getTrainerAvails = async (trainerid: any) => {
+    let params = {trainerid: trainerid}
+    let apiConfig = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: 'http://localhost:3005/trainers/getTrainerAvailability',
+      params: params,
+      headers: {"Authorization": "Bearer " + localStorage.getItem('custom-auth-token')}
+    }
+    await axios.request(apiConfig)
+      .then((response:any) => {
+        setTrainerAvails((prev: any) => {
+          return { ...prev, [trainerid]: response.data };
+        });
+        return {};
+      })
+      .catch((error:any) => {
+        console.log("Error: ", error);
+        alert(error?.response?.data ?? error.message)
+      })
+  }
+
+  const getTrainers = async () => {
+    let data = ``
       let config = {
         method: 'get',
         maxBodyLength: Infinity,
@@ -31,19 +84,27 @@ export default function Page(): React.JSX.Element {
         .then((response:any) => {
           console.log(JSON.stringify(response.data));
           setTrainers(response.data)
+          response.data.map((trainer: any) => {
+              getPersonalClasses(trainer.trainerid)
+            
+          })
           return {};
         })
         .catch((error:any) => {
           console.log("Error: ", error);
           return {error: error?.response?.data ?? error.message}
         });
-      })();
+  }
 
+  console.log("trainerAvails: ", trainerAvails)
+
+  React.useEffect(() => {
+    getTrainers();
   },[])
   
   return (
     <>
-      <TrainerTable rows={trainers} />
+      <TrainerTable rows={trainers} trainerAvails={trainerAvails} personalClasses={personalClasses} />
     </>
   );
 }
