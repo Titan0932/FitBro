@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 
-const { eq, asc } = require("drizzle-orm");
+const { eq, asc, and, ConsoleLogWriter } = require("drizzle-orm");
 
 
 const db = require("../dbConnect");
@@ -73,16 +73,28 @@ router.get("/getClassSchedule", async (req, res) => {
 
 // get all classes
 router.get("/getAllClasses", async (req, res) => {
-  // const { classid } = req.body;
+  const { classid, type, trainerid } = req.query;
   const { user } = req;
-  if(user.role != "admin"){
-    res.status(401).send("Unauthorized access");
-    return;
+  
+  let conditions = [];
+
+  if (classid) {
+      conditions.push(eq(classes.classid, classid));
   }
+  if (type) {
+      conditions.push(eq(classes.type, type));
+  }
+  if (trainerid) {
+      conditions.push(eq(classes.trainerid, trainerid));
+  }
+
+  let whereClause = conditions.length > 0 ? and(...conditions) : {};
+
+
   const result = await db
     .select()
     .from(classes)
-    // .where(eq(classes.classid, classid))  // maybe add filtering later
+    .where(whereClause)
     .execute()
     .then((data) => {
       res.status(200).send(data);
