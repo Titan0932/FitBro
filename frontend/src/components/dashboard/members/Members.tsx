@@ -30,7 +30,8 @@ export interface Member {
   user_lname: string;
   email: string;
   // address: { city: string; state: string; country: string; street: string };
-  health_metrics?: string;
+  weight?: string;
+  height?: string;
   dob: string;
 }
 
@@ -74,11 +75,10 @@ export function MemberTable({
                   
                   <TableCell >
                     <Grid container spacing={1}>
-                        {row?.health_metrics?.split(', ').map((metric, index) => (
-                        <Grid item xs={4} key={index}>
-                            <Chip color="primary" label={metric} size="medium" />
+                        <Grid item xs={6} md={12} gap={1} container>
+                            <Chip color="primary" label={<>weight: {row.weight}kg</>} size="medium" sx={{ width: 'auto', minWidth: '110px' }} />
+                            <Chip color="primary" label={<>height: {row.height}ft</>} size="medium" sx={{ width: 'auto', minWidth: '110px' }} />
                         </Grid>
-                        ))}
                     </Grid>
                   </TableCell>
                     <TableCell>
