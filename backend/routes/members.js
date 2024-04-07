@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { eq, or } = require("drizzle-orm");
+const { eq, or, and } = require("drizzle-orm");
 
 const db = require("../dbConnect");
 const {
@@ -12,7 +12,8 @@ const {
   member_exercises,
   invoices,
   schedules,
-  exercises
+  exercises,
+  member_schedule
 } = require("../db/schema");
 
 const {getid} = require('../db/userOperations')
@@ -248,48 +249,58 @@ router.post("/payBill", async (req, res) => {
       return;
     }
   
-    await db.select({price : classes.price})
-    .from(schedules)
-    .innerJoin(classes, eq(schedules.classid, classes.classid))
-    .where(eq(schedules.scheduleid, scheduleid))
-    .execute()
-    .then((data) => {
-      if(data[0].price != paidAmount){
-        res.status(400).send("Incorrect amount paid");
-        return;
+    const existingInvoice = await db
+      .select()
+      .from(invoices)
+      .where(and(eq(invoices.memberid, memberid), eq(invoices.scheduleid, scheduleid)))
+      .execute();
+
+    try{
+      if (existingInvoice.length > 0) {
+        // Invoice exists, update its status
+        if (existingInvoice[0].status === "paid") {
+          // Invoice has already been paid, return appropriate response
+          res.status(400).send("Invoice has already been paid! You previously cancelled this booking and hadn't received a refund yet! Contact admin for further assistance.");
+          return;
+        } else {
+          // Update the status of the existing invoice to "paid"
+          await db
+            .update(invoices)
+            .set({ status: "paid" })
+            .where({ memberid, scheduleid })
+            .execute();
+        }
+      } else {
+          // Invoice doesn't exist, insert a new one
+          await db
+            .insert(invoices)
+            .values({
+              memberid: memberid,
+              amount: paidAmount,
+              date: new Date(),
+              status: "paid",
+              scheduleid: scheduleid,
+            })
+            .execute();
       }
-    })
-  
-    const result = await db
-      .insert(invoices)
-      .values({
-        memberid: memberid,
-        amount: paidAmount,
-        date: new Date(),
-        status: "paid",
-        scheduleid: scheduleid,
-      })
+    }catch(err){
+      console.log(err);
+      res.status(500).send("An error occurred while paying bill");
+    }
+
+    // Update schedule status to "CONFIRMED"
+    await db.update(schedules)
+      .set({ status: "CONFIRMED" })
+      .where(eq(schedules.scheduleid, scheduleid))
       .execute()
-      .then(async () => {
-        await db.update(schedules)
-                .set({status: "CONFIRMED"})
-                .where(eq(schedules.scheduleid, scheduleid))
-                .execute()
-                .then(() => {
-                  console.log("Successfully updated schedule status")
-                })
-                .catch((err) => {
-                  console.log(err);
-                  res.status(500).send("An error occurred while updating schedule status");
-                  return;
-                })
-        return res.status(200).send("Bill paid successfully. Booking Complete!");
+      .then(() => {
+        console.log("Successfully updated schedule status")
+        res.status(200).send("Bill paid successfully. Booking Complete!");
       })
       .catch((err) => {
-         console.log(err)
-         res.status(500).send("An error occurred while paying bill");
-         return;
-      })
+        console.log(err);
+        res.status(500).send("An error occurred while updating schedule status");
+      });
 })
 
 
@@ -357,6 +368,28 @@ router.get("/getMemberInvoice", async (req, res) => {
       });
 })
 
+router.post("/bookGroupClass", async (req, res) => {
+    const { memberid, scheduleid } = req.body;
+    const { user } = req;
+    const curUserid = await getid(user.email)
+
+    if(curUserid != memberid && user.role != "admin"){
+      res.status(401).send("Unauthorized access");
+      return;
+    }
+
+    const result = await db
+      .insert(member_schedule)
+      .values({memberid: memberid, scheduleid: scheduleid})
+      .execute()
+      .then(() => {
+        res.status(200).send("Group class booked successfully");
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("Error booking group class! Class already booked?");
+      });
+})
 
 router.get("/getMemberSchedule:filterDate", async (req, res) => {
     const { memberid } = req.body;
