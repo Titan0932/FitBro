@@ -12,6 +12,7 @@ export const paths = {
     equipments: '/dashboard/equipments',
     integrations: '/dashboard/integrations',
     settings: '/dashboard/settings',
+    classes: '/dashboard/classes',
   },
   errors: { notFound: '/errors/not-found' },
 } as const;
