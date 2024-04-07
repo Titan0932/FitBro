@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
@@ -17,11 +15,7 @@ import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
 
 import { useSelection } from '@/hooks/use-selection';
-import { CardHeader, Chip, Grid } from '@mui/material';
-
-function noop(): void {
-  // do nothing
-}
+import { CardHeader, Grid, FormControlLabel, Switch } from '@mui/material';
 
 export interface Equipment {
   equipmentid: string;
@@ -31,14 +25,27 @@ export interface Equipment {
 
 interface EquipmentTableProps {
   rows?: Equipment[];
+  onUpdateStatus: (equipmentId: string, newStatus: string) => void;
 }
+
+const StatusToggle = ({ checked, onChange }: { checked: boolean; onChange: () => void }) => {
+  return (
+    <FormControlLabel
+      control={<Switch checked={checked} onChange={onChange} color={checked? 'success' : 'error'} />}
+      label={<Typography variant="body2">{checked ? 'Working' : 'Broken'}</Typography>}
+    />
+  );
+};
 
 export function EquipmentTable({
   rows = [],
+  onUpdateStatus,
 }: EquipmentTableProps): React.JSX.Element {
-  const rowIds = React.useMemo(() => {
-    return rows.map((equipment) => equipment.equipmentid);
-  }, [rows]);
+
+  const handleToggle = (equipmentId: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'working' ? 'broken' : 'working';
+    onUpdateStatus(equipmentId, newStatus);
+  };
 
   return (
     <Card>
@@ -54,28 +61,25 @@ export function EquipmentTable({
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => {
-              
-              return (
-                <TableRow hover key={row.equipmentid} >
-                    <TableCell>
-                      <Typography variant="subtitle2">{row.equipmentid}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="subtitle2">{row.name}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Chip label={row.status} color={row.status == 'working' ? 'success' : 'error'} />
-                    </TableCell>
-                </TableRow>
-              );
-            })}
+            {rows.map((row) => (
+              <TableRow hover key={row.equipmentid}>
+                <TableCell>
+                  <Typography variant="subtitle2">{row.equipmentid}</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle2">{row.name}</Typography>
+                </TableCell>
+                <TableCell>
+                  <StatusToggle
+                    checked={row.status == 'working'}
+                    onChange={() => handleToggle(row.equipmentid, row.status)}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </Box>
-      {/* <Divider /> */}
-      
     </Card>
   );
 }
-
