@@ -14,10 +14,33 @@ const metadata = { title: `Equipments | Dashboard | ${config.site.name}` } satis
 const axios = require('axios');
 
 export default function Page(): React.JSX.Element {
-  const [rooms, setRooms] = React.useState([]);
+  const [equipments, setEquipments] = React.useState([]);
 
-  React.useEffect(() => {
-    (async () => {
+
+  const onUpdateStatus = async (equipmentId: string, newStatus: string) => {
+    let data = `equipmentid=${equipmentId}&status=${newStatus}`;
+    let config = {
+      method: 'put',
+      maxBodyLength: Infinity,
+      url: 'http://localhost:3005/admin/updateEquipmentStatus',
+      data: data,
+      headers: {"Authorization": "Bearer " + localStorage.getItem('custom-auth-token')}
+    };
+
+    await axios.request(config)
+      .then((response:any) => {
+        console.log(JSON.stringify(response.data));
+        getEquipments();
+        return {};
+      })
+      .catch((error:any) => {
+        console.log("Error: ", error);
+        alert(error?.response?.data ?? error.message)
+        return {error: error?.response?.data ?? error.message}
+      });
+  };
+
+  const getEquipments = async () => {
       let data = ``
       let config = {
         method: 'get',
@@ -30,20 +53,22 @@ export default function Page(): React.JSX.Element {
       await axios.request(config)
         .then((response:any) => {
           console.log(JSON.stringify(response.data));
-          setRooms(response.data)
+          setEquipments(response.data)
           return {};
         })
         .catch((error:any) => {
           console.log("Error: ", error);
           return {error: error?.response?.data ?? error.message}
         });
-      })();
+  }
 
+  React.useEffect(() => {
+    getEquipments();
   },[])
   
   return (
     <>
-      <EquipmentTable rows={rooms} />
+      <EquipmentTable rows={equipments} onUpdateStatus={onUpdateStatus} />
     </>
   );
 }
