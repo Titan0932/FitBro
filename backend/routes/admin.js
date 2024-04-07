@@ -41,6 +41,7 @@ router.get("/getAllEquipments", async (req, res) => {
       .select()
       .from(equipments)
       // .where(eq(equipments.roomid, roomid))
+      .orderBy(equipments.equipmentid, "ASC")
       .execute()
       .then((data) => {
         res.status(200).send(data);
@@ -48,6 +49,32 @@ router.get("/getAllEquipments", async (req, res) => {
       .catch((err) => {
         console.log(err);
         res.status(500).send("An error occurred while fetching equipments");
+      });
+})
+
+router.put("/updateEquipmentStatus", async (req, res) => {
+    const { equipmentid, status } = req.body;
+    const { user } = req;
+
+    if(user.role?.toLowerCase() != "admin"){
+      res.status(401).send("Unauthorized access");
+      return;
+    }
+    console.log(equipmentid, status);
+
+    const result = await db
+      .update(equipments)
+      .set({
+        status: status
+      })
+      .where(eq(equipments.equipmentid, equipmentid))
+      .execute()
+      .then((data) => {
+        res.status(200).send("Equipment status updated successfully");
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("An error occurred while updating equipment status");
       });
 })
   
