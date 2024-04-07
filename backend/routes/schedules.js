@@ -65,6 +65,7 @@ router.get("/getMemberSchedule", async (req, res) => {
       })
 })  
 
+
 router.delete("/deletePersonalClass", async (req, res) => {
     const { memberid, scheduleid } = req.query;
     const { user } = req;
@@ -75,8 +76,25 @@ router.delete("/deletePersonalClass", async (req, res) => {
               .set({ status: "CANCELLED" })
               .where(eq(schedules.scheduleid, scheduleid))
               .execute()
-              .then(() => {
-                res.status(200).send("Schedule deleted successfully");
+              .then(async () => {
+                console.log("Schedule Status Changed!");
+                await db.delete(member_schedule)
+                        .where(eq(member_schedule.scheduleid, scheduleid))
+                        .execute()
+                        .then(async () => {
+                          console.log("Member schedule deleted successfully");
+                          await db.delete(trainer_schedule)
+                                  .where(eq(trainer_schedule.scheduleid, scheduleid))
+                                  .execute()
+                                  .then(() => {
+                                    console.log("Trainer schedule deleted successfully");
+                                    res.status(200).send("Schedule deleted successfully");
+                                  })
+                        })
+                        .catch((err) => {
+                          console.log(err);
+                          res.status(500).send("An error occurred while deleting member schedule");
+                        })
               })
               .catch((err) => {
                 console.log(err);
@@ -86,6 +104,29 @@ router.delete("/deletePersonalClass", async (req, res) => {
     else{
       return res.status(401).send("Unauthorized access");
     }
+})
+
+router.delete("/cancelGroupBooking", async (req, res) => {
+  const { memberid, scheduleid } = req.query;
+  const { user } = req;
+  const curUserid = await getid(user.email)
+
+  if(curUserid != memberid && user.role != "admin"){
+    res.status(401).send("Unauthorized access");
+    return;
+  }
+
+  const result = await db
+    .delete(member_schedule)
+    .where(and(eq(member_schedule.memberid, memberid), eq(member_schedule.scheduleid, scheduleid)))
+    .execute()
+    .then(() => {
+      res.status(200).send("Group class booking cancelled successfully");
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("An error occurred while cancelling group class booking");
+    });
 })
 
 //create a schedule
@@ -173,7 +214,7 @@ router.post("/createPersonalSchedule", async (req, res) => {
       return res.status(401).send("Unauthorized access");
     }
 })
-  
+
 // get a trainer's schedule
 router.get("/getTrainerSchedule", async (req, res) => {
     const { trainerid, date, status='' } = req.query;
