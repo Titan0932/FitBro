@@ -18,23 +18,23 @@ const axios = require('axios');
 export default function Page(): React.JSX.Element {
   const [schedule, setSchedule] = React.useState([]);
   const user = React.useContext(UserContext);
-  const [toDelete, setToDelete] = React.useState(-1);
+  const [toDelete, setToDelete] = React.useState(null);
   const router = useRouter();
   
   const deleteSchedule = async () => {
-    console.log("deleting schedule: ", toDelete)
+    let url = toDelete?.classType == 'personal' ? 'http://localhost:3005/schedules/deletePersonalClass' : 'http://localhost:3005/schedules/cancelGroupBooking';
     const apiConfig = {
       method: 'delete',
       maxBodyLength: Infinity,
-      url: 'http://localhost:3005/schedules/deletePersonalClass',
-      params: {scheduleid : toDelete, memberid: user?.user?.userid},
+      url: url,
+      params: {scheduleid : toDelete?.scheduleid, memberid: user?.user?.userid},
       headers: {"Authorization": "Bearer " + localStorage.getItem('custom-auth-token')}
     }
 
     await axios.request(apiConfig)
             .then((response:any) => {
               console.log(JSON.stringify(response.data));
-              setToDelete(-1);
+              setToDelete(null);
               return {};
             })
             .catch((error:any) => {
@@ -86,7 +86,7 @@ export default function Page(): React.JSX.Element {
                 }
                 action={
                   <>
-                    <IconButton color='error' aria-label="delete" onClick={() => setToDelete(item.scheduleid)}>
+                    <IconButton color='error' aria-label="delete" onClick={() => setToDelete(item)}>
                       <DeleteIcon size={32} />
                     </IconButton>
                   </>
@@ -117,14 +117,14 @@ export default function Page(): React.JSX.Element {
         ))}
       </Grid>
       }
-      <DeleteConfirmationModal deleteId={toDelete} onClose={() => setToDelete(-1)} onConfirm={deleteSchedule} />
+      <DeleteConfirmationModal deleteId={toDelete?.scheduleid} onClose={() => setToDelete(null)} onConfirm={deleteSchedule} />
     </>
   );
 }
 
 const DeleteConfirmationModal = ({ deleteId, onClose, onConfirm } : { deleteId: number, onClose: () => void, onConfirm: () => void }) => {
   return (
-    <Dialog open={deleteId != -1} onClose={onClose}>
+    <Dialog open={deleteId != null} onClose={onClose}>
       <DialogTitle>Confirm Deletion</DialogTitle>
       <DialogContent>
         <DialogContentText>
