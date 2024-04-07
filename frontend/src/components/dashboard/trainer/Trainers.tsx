@@ -59,6 +59,7 @@ export function TrainerTable({
 
   const [selectedTrainer, setSelectedTrainer] = React.useState<Trainer | null>(null);
   const [modalOpen, setModalOpen] = React.useState(false);
+  const user = React.useContext(UserContext);
 
   const handleRowClick = (trainer: Trainer) => {
     setSelectedTrainer(trainer);
@@ -112,7 +113,7 @@ export function TrainerTable({
         </Table>
       </Box>
       {/* <Divider /> */}
-      <TrainerModal modalOpen={modalOpen} handleCloseModal={handleCloseModal} selectedTrainer={selectedTrainer} availabilities={trainerAvails && trainerAvails[selectedTrainer?.trainerid]} personalClass={personalClasses[selectedTrainer?.trainerid]} />
+      <TrainerModal modalOpen={modalOpen} handleCloseModal={handleCloseModal} selectedTrainer={selectedTrainer} availabilities={trainerAvails && trainerAvails[selectedTrainer?.trainerid]} personalClass={personalClasses[selectedTrainer?.trainerid]} /> 
     </Card>
   );
 }
@@ -261,7 +262,7 @@ const TrainerModal = ({modalOpen, handleCloseModal, selectedTrainer, availabilit
                         }  
               />
               <Divider />
-              <CardContent mt={2} sx={{paddingBottom: 0}} >
+              <CardContent sx={{paddingBottom: 0}} >
                 <Grid container gap={2} justifyContent={"center"} >
                 {availabilities.length > 0 ? 
                   availabilities.map(({ date }: {date:any}) => (
@@ -279,7 +280,7 @@ const TrainerModal = ({modalOpen, handleCloseModal, selectedTrainer, availabilit
                //)
               }
               <CardActions>
-                {availabilities.length > 0 && <Button onClick={bookClass} variant="contained" color="primary" sx={{ mt: 2 }} disabled= {!selectedDate || !selectedTime}>Book</Button>}
+                {availabilities.length > 0 && user?.role == "admin" && <Button onClick={bookClass} variant="contained" color="primary" sx={{ mt: 2 }} disabled= {!selectedDate || !selectedTime}>Book</Button>}
                 <Button onClick={onClose} variant="outlined" color="secondary" sx={{ mt: 2 }}>Close</Button>
                 </CardActions>
             </>
