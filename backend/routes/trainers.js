@@ -154,4 +154,29 @@ router.post('/addAvailability', async (req, res) => {
       });
   })
 
+  router.get("/getTrainerDetails", async (req, res) => {
+    const { user } = req;
+    const { trainerid } = req.query;
+    
+    const result = await db
+      .select({
+        trainerid: trainers.trainerid,
+        email: users.email,
+        f_name: users.f_name,
+        l_name: users.l_name,
+        speciality: trainers.speciality,
+      })
+      .from(trainers)
+      .innerJoin(users, eq(trainers.trainerid, users.userid))
+      .where(eq(trainers.trainerid, trainerid))
+      .execute()
+      .then((data) => {
+        res.status(200).send(data);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("An error occurred while fetching trainer details");
+      });
+  })
+
 module.exports = router;
