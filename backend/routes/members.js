@@ -338,7 +338,6 @@ router.get("/getAllMembersByName", async (req, res) => {
       .leftJoin(members, eq(users.userid, members.memberid))
       .where(Object.keys(whereClause).length > 0 && whereClause)
       .then((data) => {
-        console.log("DATA: ", data);
         res.status(200).send(data);
       })
       .catch((err) => {

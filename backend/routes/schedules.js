@@ -146,11 +146,11 @@ async function insertTrainerSchedule( trainerid, scheduleid ) {
 router.post("/createGroupSchedule", async (req, res) => {
     const { id, classid, roomid, date, start_time, duration, type ,status="pending", trainerid } = req.body;
     const { user } = req;
-  
-    if(type == "group" && user.role == "admin"){
+    console.log(user);
+    if(type == "group" && user.role?.toLowerCase() == "admin"){
       await insertSchedule(classid, roomid, date, start_time, duration, status)
               .then(async (data) => {
-                await insertTrainerSchedule(trainerid, data.scheduleid)
+                await insertTrainerSchedule(trainerid, data[0].scheduleid)
                   .then(() => {
                     console.log("Trainer schedule created successfully");
                   })
@@ -168,7 +168,7 @@ router.post("/createGroupSchedule", async (req, res) => {
               })
       return;
     }
-    return req.status(401).send("Unauthorized access");
+    return res.status(401).send("Unauthorized access");
 })
   
 router.post("/createPersonalSchedule", async (req, res) => {
@@ -260,7 +260,77 @@ router.get("/getTrainerSchedule", async (req, res) => {
         res.status(500).send("An error occurred while fetching trainer schedule");
       })
 })
-  
 
+router.put("/updateSchedule", async (req, res) => {
+    const { scheduleid, status, start_time, duration, date } = req.body;
+    const { user } = req;
+  
+    if(user.role?.toLowerCase() != "admin"){
+      res.status(401).send("Unauthorized access");
+      return;
+    }
+    let updates = {};
+    if(status){
+      updates.status = status;
+    }
+    if(start_time){
+      updates.start_time = start_time;
+    }
+    if(duration){
+      updates.duration = duration;
+    }
+    if(date){
+      updates.date = date;
+    }
+
+  
+    const result = await db
+      .update(schedules)
+      .set(updates)
+      .where(eq(schedules.scheduleid, scheduleid))
+      .execute()
+      .then(() => {
+        res.status(200).send("Schedule status updated successfully");
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("An error occurred while updating schedule status");
+      });
+})
+
+
+router.get("/getSchedule", async (req, res) => {
+    const {scheduleid, date, status, duration, start_time} = req.query;
+    const { user } = req;
+
+    let conditions = [];
+    if(scheduleid){
+      conditions.push(eq(schedules.scheduleid, scheduleid));
+    }
+    if(date){
+      conditions.push(eq(schedules.date, date));
+    }
+    if(status){
+      conditions.push(eq(schedules.status, status));
+    }
+    if(duration){
+      conditions.push(eq(schedules.duration, duration));
+    }
+    if(start_time){
+      conditions.push(eq(schedules.start_time, start_time));
+    }
+    let whereClause = conditions.length > 0 ? and(...conditions) : null;
+
+    const result = await db.select().from(schedules).where(whereClause).orderBy(asc(schedules.date), asc(schedules.start_time)).execute()
+                            .then((data) => {
+                              res.status(200).send(data);
+                              return;
+                            })
+                            .catch((err) => {
+                              console.log(err);
+                              res.status(500).send("An error occurred while fetching schedule");
+                              return;
+                            })
+})
 
 module.exports = router;

@@ -105,5 +105,72 @@ router.get("/getAllClasses", async (req, res) => {
             });
 })
 
+router.delete("/deleteClass", async (req, res) => {
+  const { classid } = req.query;
+  const { user } = req;
+
+  if(user.role?.toLowerCase() != "admin"){
+    res.status(401).send("Unauthorized access");
+    return;
+  }
+
+  const classTimings  = await db.select().from(schedules).where(eq(schedules.classid, classid)).execute();
+
+  if(classTimings.length == 0){
+    const result = await db
+      .delete(classes)
+      .where(eq(classes.classid, classid))
+      .execute()
+      .then((data) => {
+        res.status(200).send("Class deleted successfully");
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("An error occurred while deleting class");
+      });
+    } else {
+      res.status(400).send("Class has registered schedules or previous recorded bookings. Cannot delete class!");
+    }
+})
+
+router.post("/addClass", async (req, res) => {
+  const { name, description, type, trainerid, price } = req.body;
+  const { user } = req;
+
+  if(user.role?.toLowerCase() != "admin"){
+    res.status(401).send("Unauthorized access");
+    return;
+  }
+
+  if(type?.toLowerCase() == 'personal'){
+    // check if the sent trainer already has a personal class
+      // if yes, return error
+    const personalClasses = await db.select().from(classes).where(and(eq(classes.type, 'personal'), eq(classes.trainerid, trainerid))).execute();
+    if(personalClasses.length > 0){
+      res.status(400).send("Trainer already has a personal class");
+      return;
+    }
+  }
+
+  const result = await db
+    .insert(classes)
+    .values({
+      name: name,
+      description: description,
+      type: type,
+      trainerid: trainerid,
+      price: price
+    })
+    .execute()
+    .then((data) => {
+      res.status(200).send("Class added successfully");
+      return;
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("An error occurred while adding class");
+      return;
+    });
+})
 
 module.exports = router;
