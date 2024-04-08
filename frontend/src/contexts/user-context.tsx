@@ -19,6 +19,7 @@ export interface UserContextValue {
   role?: string;
   updateRole?: (role: string, checkRole?: boolean) => Promise<void>;
   setState?: React.Dispatch<React.SetStateAction<UserContextValue>>;
+  updateUserInfo?: (values: any) => Promise<void>;
 }
 
 export const UserContext = React.createContext<UserContextValue | undefined>(undefined);
@@ -39,6 +40,7 @@ export function UserProvider({ children }: UserProviderProps): React.JSX.Element
     setState: () => {throw new Error('setState function must be overridden');},
   });
 
+
   const checkSession = React.useCallback(async (): Promise<void> => {
     try {
       const { data, error } = await authClient.getUser();
@@ -58,6 +60,8 @@ export function UserProvider({ children }: UserProviderProps): React.JSX.Element
   React.useEffect(() => {
     checkSession().catch((err: unknown) => {
       logger.error(err);
+      setState((prev) => ({...prev, setState}))
+
       // noop
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Expected
@@ -121,7 +125,35 @@ export function UserProvider({ children }: UserProviderProps): React.JSX.Element
     }
   }
 
-  return <UserContext.Provider value={{ ...state, checkSession, setState, updateRole }}>{children}</UserContext.Provider>;
+  const updateUserInfo = async (values: any) => {
+    let config = {
+      method: 'put',
+      maxBodyLength: Infinity,
+      url: 'http://localhost:3005/users/updateUserInfo',
+      data: `f_name=${values.f_name}&l_name=${values.l_name}&email=${values.email}&phoneno=${values.phoneno}&city=${values.city}&state=${values.state}&country=${values.country}`,
+      headers: {"Authorization": "Bearer " + localStorage.getItem('custom-auth-token')}
+    };
+    return await axios.request(config)
+      .then(async (response:any) => {
+        if(response){
+          console.log("Updated user info: ", response.data);
+          setState((prev) => ({
+            ...prev,
+            user: {
+              ...prev.user,
+              ...values,
+            },
+          }));
+          alert("User info updated successfully");
+        }
+      })
+      .catch((error:any) => {
+        console.log("Error: ", error);
+        alert(error?.response?.data ?? error.message)
+      })
+  };
+
+  return <UserContext.Provider value={{ ...state, checkSession, setState, updateRole, updateUserInfo }}>{children}</UserContext.Provider>;
 }
 
 export const UserConsumer = UserContext.Consumer;

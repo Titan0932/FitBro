@@ -70,25 +70,8 @@ export function AccountDetailsForm(): React.JSX.Element {
       alert("No changes made");
       return;
     }else{
-      let config = {
-        method: 'put',
-        maxBodyLength: Infinity,
-        url: 'http://localhost:3005/users/updateUserInfo',
-        data: `f_name=${values.f_name}&l_name=${values.l_name}&email=${values.email}&phoneno=${values.phoneno}&city=${values.city}&state=${values.state}&country=${values.country}`,
-        headers: {"Authorization": "Bearer " + localStorage.getItem('custom-auth-token')}
-      };
-      await axios.request(config)
-      .then(async (response:any) => {
-        if(response){
-          console.log("Updated user info: ", response.data);
-          user?.setState((prev) => ({ ...prev, user: values }));
-          alert("User info updated successfully");
-        }
-      })
-      .catch((error:any) => {
-        console.log("Error: ", error);
-        alert(error?.response?.data ?? error.message)
-      })
+      await user?.updateUserInfo(values);
+      
       setIsPending(false);
       router.refresh();
     }
