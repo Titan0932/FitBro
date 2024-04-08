@@ -14,9 +14,9 @@ export const memberNavitems = [
 ] satisfies NavItemConfig[];
 
 export const trainerNavitems = [
-  { key: 'overview', title: 'Overview', href: paths.dashboard.overview, icon: 'chart-pie' },
+  // { key: 'overview', title: 'Overview', href: paths.dashboard.overview, icon: 'chart-pie' },
+  { key: 'Schedule', title: 'Schedule', href: paths.dashboard.overview, icon: 'schedule' },
   { key: 'Members', title: 'Members', href: paths.dashboard.members, icon: 'users' },
-  { key: 'Schedule', title: 'Schedule', href: paths.dashboard.trainerSchedule, icon: 'schedule' },
   { key: 'account', title: 'Account', href: paths.dashboard.account, icon: 'user' },
   // { key: 'integrations', title: 'Integrations', href: paths.dashboard.integrations, icon: 'plugs-connected' },
   // { key: 'settings', title: 'Settings', href: paths.dashboard.settings, icon: 'gear-six' },
