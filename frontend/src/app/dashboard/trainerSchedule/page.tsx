@@ -78,11 +78,10 @@ export default function Page(): React.JSX.Element {
       .then((response: any) => {
         // console.log(JSON.stringify(response.data));
         setAvailability(response.data);
-        return {};
       })
       .catch((error: any) => {
         console.log('Error: ', error);
-        return { error: error?.response?.data ?? error.message };
+        alert( error?.response?.data ?? error.message);
       });
   };
 
@@ -153,7 +152,7 @@ const TrainerSchedule = ({ schedule }: { schedule: never[] }) => {
   );
 };
 
-const TrainerAvailability = ({ availability, getAvailability }: { availability: never[], setAvailability: () => {} }) => {
+const TrainerAvailability = ({ availability, getAvailability }: { availability: never[], getAvailability: () => {} }) => {
   const [open, setOpen] = React.useState(false);
   const user = React.useContext(UserContext);
   const router = useRouter();
@@ -163,7 +162,7 @@ const TrainerAvailability = ({ availability, getAvailability }: { availability: 
     end_time: '',
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e:any) => {
     const { id, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
@@ -262,11 +261,11 @@ const TrainerAvailability = ({ availability, getAvailability }: { availability: 
                 <CardContent>
                   <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
                   <Typography variant="h6" color="primary" marginBottom={0} gutterBottom>
-                    {slot.date} 
+                    {slot?.date} 
                   </Typography>
-                  <IconButton aria-label="Delete Availability" onClick={ () => handleDelete(slot.availabilityid)}><DeleteIcon style={{ fontSize: 24, color: 'red' }} /></IconButton></div>
+                  <IconButton aria-label="Delete Availability" onClick={ () => handleDelete(slot?.availabilityid)}><DeleteIcon style={{ fontSize: 24, color: 'red' }} /></IconButton></div>
                   <Typography variant="body1">
-                    {slot.start_time} - {slot.end_time}
+                    {slot?.start_time} - {slot?.end_time}
                   </Typography>
                 </CardContent>
               </Paper>
