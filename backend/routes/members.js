@@ -79,7 +79,7 @@ router.get("/getFitnessGoals/:status", async (req, res) => {
     const { memberid } = req.query;
     const { status } = req.params;
     const { user } = req;
-
+  
     const curUserid = await getid(user.email)
     if(curUserid != memberid){
       return res.status(401).send("Unauthorized Access!");
@@ -306,7 +306,7 @@ router.post("/payBill", async (req, res) => {
 
 router.get("/getAllMembersByName", async (req, res) => {
     // console.log(authHeader)
-    const {user_fname, user_lname} = req.body;
+    const {user_fname, user_lname} = req.query;
     const { user } = req;
     if((user.role)?.toLowerCase() != "admin" && (user.role)?.toLowerCase() != "trainer"){
       res.status(401).send("Unauthorized access");
@@ -334,8 +334,8 @@ router.get("/getAllMembersByName", async (req, res) => {
         weight: members.weight,
         height: members.height,
       })
-      .from(users)
-      .leftJoin(members, eq(users.userid, members.memberid))
+      .from(members)
+      .leftJoin(users, eq(users.userid, members.memberid))
       .where(Object.keys(whereClause).length > 0 && whereClause)
       .then((data) => {
         res.status(200).send(data);

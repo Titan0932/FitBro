@@ -71,7 +71,7 @@ router.delete("/deletePersonalClass", async (req, res) => {
     const { user } = req;
     const curUserid = await getid(user.email);
     
-    if( (user.role == "member" && curUserid == memberid) || user.role == "admin"){
+    if( (user?.role?.toLowerCase() == "member" && curUserid == memberid) || user?.role?.toLowerCase() == "admin"){
       await db.update(schedules)
               .set({ status: "CANCELLED" })
               .where(eq(schedules.scheduleid, scheduleid))
@@ -176,7 +176,7 @@ router.post("/createPersonalSchedule", async (req, res) => {
     const { user } = req;
     const curUserid = await getid(user.email);
     
-    if( (user.role == "member" && curUserid == memberid) || user.role == "admin"){
+    if( (user?.role?.toLowerCase() == "member" && curUserid == memberid) || user?.role?.toLowerCase() == "admin"){
       await insertSchedule(classid, roomid, date, start_time, duration, status)
               .then(async (data) => {
                 await insertTrainerSchedule(trainerid, data[0].scheduleid)
