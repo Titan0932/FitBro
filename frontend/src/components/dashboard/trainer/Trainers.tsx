@@ -280,7 +280,7 @@ const TrainerModal = ({modalOpen, handleCloseModal, selectedTrainer, availabilit
                //)
               }
               <CardActions>
-                {availabilities.length > 0 && user?.role != "admin" && <Button onClick={bookClass} variant="contained" color="primary" sx={{ mt: 2 }} disabled= {!selectedDate || !selectedTime}>Book</Button>}
+                {availabilities.length > 0 && user?.role?.toLowerCase() != "admin" && <Button onClick={bookClass} variant="contained" color="primary" sx={{ mt: 2 }} disabled= {!selectedDate || !selectedTime}>Book</Button>}
                 <Button onClick={onClose} variant="outlined" color="secondary" sx={{ mt: 2 }}>Close</Button>
                 </CardActions>
             </>
