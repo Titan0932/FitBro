@@ -61,7 +61,8 @@ CREATE TABLE classes(
 
 CREATE TABLE rooms(
     roomID SERIAL PRIMARY KEY,
-    name TEXT NOT NULL
+    name TEXT NOT NULL,
+    status TEXT NOT NULL
 );
 
 CREATE TABLE equipments(

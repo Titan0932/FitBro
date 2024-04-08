@@ -63,6 +63,7 @@ const fitness_goals = pgTable('fitness_goals', {
   const rooms = pgTable('rooms', {
     roomid: serial('roomid').primaryKey(),
     name: text('name').notNull(),
+    status: text('status').notNull(),
   });
   
   const equipments = pgTable('equipments', {

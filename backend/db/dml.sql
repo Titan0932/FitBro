@@ -32,9 +32,10 @@ insert into admins(adminID) values(5);
 insert into users(email, f_name, l_name, user_passw, user_dob) values('ravisKumar@test.com', 'Ravis', 'Kumar', '$2b$10$HNwWou8p2/O.de1J62ilhOW7bcHRdCinF0Xgy.2AdtEFlTk4YgXZm', '1994-01-01'); /* password4 */
 insert into Admins(adminID) values(6);
 
-insert into rooms(name) values('Room 1');
-insert into rooms(name) values('Room 2');
-insert into rooms(name) values('Room 3');
+insert into rooms(name, status) values('Room 1', 'AVAILABLE');
+insert into rooms(name, status) values('Room 2', 'AVAILABLE');
+insert into rooms(name, status) values('Room 3', 'AVAILABLE');
+insert into rooms(name, status) values('Room 4', 'UNAVAILABLE');
 
 insert into schedules(roomID, classID, date ,start_time, duration, status) values(3, 1, '2024-04-11' ,'08:00:00', 2, 'CONFIRMED');
 insert into schedules(roomID, classID, date ,start_time, duration, status) values(3, 1, '2024-04-11' ,'10:00:00', 2, 'CONFIRMED');
