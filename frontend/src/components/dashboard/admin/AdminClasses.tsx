@@ -27,6 +27,7 @@ export const AdminClasses = () => {
     const [selectedSlot, setSelectedSlot] = React.useState(null);
     const [openEditModal, setOpenEditModal] = React.useState(false);
     const [classScheduleToAdd, setClassScheduleToAdd] = React.useState(null);
+    const [availableRooms, setAvailableRooms] = React.useState([]);
 
     const closeEditModal = () => {
         setOpenEditModal(false);
@@ -128,9 +129,29 @@ export const AdminClasses = () => {
         setSelectedSlot(null);
     }
 
+    const getAvailableRooms = async() => {
+        const apiConfig = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'http://localhost:3005/admin/getAllRooms',
+            headers: {"Authorization": "Bearer " + localStorage.getItem('custom-auth-token')},
+            params: {status: "AVAILABLE"}
+        }
+        await axios.request(apiConfig)
+            .then((response:any) => {
+                setAvailableRooms(response.data);
+                return response.data;
+            })
+            .catch((error:any) => {
+                console.log("Error: ", error);
+                return {error: error?.response?.data ?? error.message}
+            })
+    }
+
     React.useEffect(() => {
         getTrainerDetails();
         getClasses();
+        getAvailableRooms();
     },[])
 
     React.useEffect(() => {
@@ -251,7 +272,7 @@ export const AdminClasses = () => {
         }
     }
 
-    const addGroupSchedule = async(newStartDate:any, newStartTime:any, newDuration:any) => {
+    const addGroupSchedule = async(newStartDate:any, newStartTime:any, newDuration:any, room: any) => {
         event.preventDefault();
         if(newDuration > 3 || newDuration < 1) {
             return alert("Duration should be between 1 and 3 hours!");
@@ -264,7 +285,7 @@ export const AdminClasses = () => {
                 maxBodyLength: Infinity,
                 url: 'http://localhost:3005/schedules/createGroupSchedule',
                 headers: {"Authorization": "Bearer " + localStorage.getItem('custom-auth-token')},
-                data: `&date=${newStartDate}&start_time=${newStartTime}&duration=${newDuration}&status=CONFIRMED&classid=${classScheduleToAdd?.classid}&roomid=1&type=group&trainerid=${classScheduleToAdd?.trainerid}`
+                data: `&date=${newStartDate}&start_time=${newStartTime}&duration=${newDuration}&status=CONFIRMED&classid=${classScheduleToAdd?.classid}&roomid=${room ?? 1}&type=group&trainerid=${classScheduleToAdd?.trainerid}`
             }
             await axios.request(apiConfig)
                         .then((response:any) => {
@@ -306,7 +327,7 @@ export const AdminClasses = () => {
             </Grid>
             <ClassModal classToDelete={classToDelete} onClose={classModalClose} classTimes={classTimes} deleteClass={deleteClass} updateClass={updateClass} selectedSlot={selectedSlot} onSelectTime={onSelectTime} openEditModal={openEditModal} closeEditModal={closeEditModal} setOpenEditModal={setOpenEditModal} /> {/* trainer={trainers[classToDelete?.trainerid]} */}
             <AddClass open={createClassOpen} trainers={trainers} createClass={createClass} onClose={closeCreateClass} />
-            <AddGroupScheduleModal modalOpen={classScheduleToAdd!=null} onClose={closeGroupScheduleModal} addGroupSchedule={addGroupSchedule} />
+            <AddGroupScheduleModal modalOpen={classScheduleToAdd!=null} onClose={closeGroupScheduleModal} addGroupSchedule={addGroupSchedule} availableRooms={availableRooms} />
         </div>
     )
 
@@ -617,10 +638,11 @@ const EditClassModal = ({modalOpen, onClose, updateClass}: {modalOpen: boolean, 
 }
 
 
-const AddGroupScheduleModal = ({modalOpen, onClose, addGroupSchedule}: {modalOpen: boolean, onClose: () => void, addGroupSchedule: (newDate: any, newTime: any, newDuration:any) => void}) => {
+const AddGroupScheduleModal = ({modalOpen, onClose, addGroupSchedule, availableRooms}: {modalOpen: boolean, onClose: () => void, addGroupSchedule: (newDate: any, newTime: any, newDuration:any, room:any) => void, availableRooms: any}) => {
     const [selectedDate, setSelectedDate] = React.useState(null);
     const [startTime, setStartTime] = React.useState(null);
     const [duration, setDuration] = React.useState(null);
+    const [room, setRoom] = React.useState(null);
     const user = React.useContext(UserContext);
 
     return(
@@ -632,7 +654,7 @@ const AddGroupScheduleModal = ({modalOpen, onClose, addGroupSchedule}: {modalOpe
                         sx={{padding: "0 0 1rem 0"}}
                     />
                     <Divider />
-                    <form onSubmit={() => addGroupSchedule(selectedDate, startTime, duration)}>
+                    <form onSubmit={() => addGroupSchedule(selectedDate, startTime, duration, room)}>
                         <CardContent sx={{paddingBottom: 0}} >
                         <Grid container gap={2} justifyContent={"center"} >
                             <TextField
@@ -670,6 +692,22 @@ const AddGroupScheduleModal = ({modalOpen, onClose, addGroupSchedule}: {modalOpe
                                 onChange={(e) => setDuration(e.target.value)}
                                 required={true}
                             />
+                            <TextField
+                                margin="dense"
+                                label="Select Room"
+                                fullWidth
+                                select
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                                onChange={(e) => setRoom(e.target.value)}
+                            >
+                                {
+                                    availableRooms.map((room: any) => (
+                                        <MenuItem value={room.roomid}>{room.name}</MenuItem>
+                                    ))
+                                }
+                            </TextField>
                         </Grid>
                         </CardContent>
                         <CardActions>
