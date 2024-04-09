@@ -84,6 +84,10 @@ PUT /users/updateUserInfo
         user_passw: User's current password (String)
         user_dob (Optional): User's updated date of birth (String)
         new_passw (Optional): User's new password (String)
+		city(Optional): (String)
+		state(Optional): (String)
+		phoneno(Optional): (String)
+		country(Optional): (String)
 
     Success Response:
         Status Code: 200
@@ -182,7 +186,9 @@ GET /classes/getAllClasses
 		Retrieves all classes available in the system.
 
 	Request Parameters:
-		None
+		classid(Optional): int
+		type(Optional): string
+		trainerid(Optional): string
 
 	Request Headers:
 		Authorization: Bearer your_jwt_token_here
@@ -198,6 +204,66 @@ GET /classes/getAllClasses
 		Status Code: 500 Internal Server Error
 		Response Body: "An error occurred while fetching classes"
 
+----
+
+POST /admin/addClass
+
+Description:
+Registers a new class in the system.
+
+Request Body:
+
+name: Name of the class (String)
+description: Description of the class (String)
+type: Type of the class ("group" or "personal") (String)
+trainerid: ID of the trainer for the class (String)
+price: Price of the class (String)
+Success Response:
+Status Code: 200
+Response Body: "Class added successfully"
+
+Error Responses:
+
+If unauthorized:
+Status Code: 401
+Response Body: "Unauthorized access"
+If the trainer already has a personal class:
+Status Code: 400
+Response Body: "Trainer already has a personal class"
+If there's an error during class addition:
+Status Code: 500
+Response Body: Error message
+
+-------
+
+DELETE /admin/deleteClass
+
+Description:
+Deletes a class from the system.
+
+Request Parameters:
+
+classid: ID of the class to delete (String)
+Request Headers:
+
+Authorization: Bearer your_jwt_token_here
+Success Response:
+Status Code: 200
+Response Body: "Class deleted successfully"
+
+Error Responses:
+
+If unauthorized:
+Status Code: 401
+Response Body: "Unauthorized access"
+If the class has registered schedules or previous recorded bookings:
+Status Code: 400
+Response Body: "Class has registered schedules or previous recorded bookings. Cannot delete class!"
+If there's an error during class deletion:
+Status Code: 500
+Response Body: Error message
+
+-----
 
 ## Schedules
 
@@ -208,6 +274,7 @@ GET /schedules/getMemberSchedule
 
 	Request Parameters:
 		- memberid: ID of the member whose schedule is to be retrieved (String)
+		- status(Optional): schedule's status
 
 	Request Headers:
 		Authorization: Bearer your_jwt_token_here
@@ -219,6 +286,33 @@ GET /schedules/getMemberSchedule
 	Error Responses:
 		Status Code: 500 Internal Server Error
 		Response Body: "An error occurred while fetching member schedule"
+
+---
+
+DELETE /members/deletePersonalClass
+
+Description:
+Deletes a personal class from the system for the authorized member or admin.
+
+Request Parameters:
+
+memberid: ID of the member requesting deletion (String)
+scheduleid: ID of the schedule to delete (String)
+Request Headers:
+
+Authorization: Bearer your_jwt_token_here
+Success Response:
+Status Code: 200
+Response Body: "Schedule deleted successfully"
+
+Error Responses:
+
+If unauthorized:
+Status Code: 401
+Response Body: "Unauthorized access"
+If there's an error during schedule deletion or member schedule deletion:
+Status Code: 500
+Response Body: Error message
 
 ---
 
@@ -254,13 +348,40 @@ POST /schedules/createGroupSchedule
 
 ---
 
+DELETE /bookings/cancelGroupBooking
+
+Description:
+Cancels a group class booking for the authorized member or admin.
+
+Request Parameters:
+
+memberid: ID of the member requesting cancellation (String)
+scheduleid: ID of the schedule for which booking is to be cancelled (String)
+Request Headers:
+
+Authorization: Bearer your_jwt_token_here
+Success Response:
+Status Code: 200
+Response Body: "Group class booking cancelled successfully"
+
+Error Responses:
+
+If unauthorized:
+Status Code: 401
+Response Body: "Unauthorized access"
+If there's an error during cancellation:
+Status Code: 500
+Response Body: Error message
+
+---
+
 POST /schedules/createPersonalSchedule
 
 	Description:
 		Creates a personal schedule for a member.
 
 	Request Parameters:
-		- id: ID of the schedule (String)
+		- memberid: ID of the member (String)
 		- classid: ID of the class (String)
 		- roomid: ID of the room (String)
 		- date: Date of the schedule (String)
@@ -293,6 +414,8 @@ GET /schedules/getTrainerSchedule
 
 	Request Parameters:
 		- trainerid: ID of the trainer whose schedule is to be retrieved (String)
+		- date(Optional): 
+		- status(Optional): 
 
 	Request Headers:
 		Authorization: Bearer your_jwt_token_here
@@ -308,9 +431,127 @@ GET /schedules/getTrainerSchedule
 		Status Code: 500 Internal Server Error
 		Response Body: "An error occurred while fetching trainer schedule"
 
+---
 
+PUT /schedules/updateSchedule
+
+Description:
+Updates the details of a schedule by an admin.
+
+Request Body:
+
+scheduleid: ID of the schedule to be updated (String)
+status: Updated status of the schedule (String)
+start_time: Updated start time of the schedule (String)
+duration: Updated duration of the schedule (String)
+date: Updated date of the schedule (String)
+Request Headers:
+
+Authorization: Bearer your_jwt_token_here
+Success Response:
+Status Code: 200
+Response Body: "Schedule status updated successfully"
+
+Error Responses:
+
+If unauthorized:
+Status Code: 401
+Response Body: "Unauthorized access"
+If there's an error during updating:
+Status Code: 500
+Response Body: Error message
+
+---
+
+GET /schedules/getSchedule
+
+Description:
+Retrieves schedule(s) based on specified criteria.
+
+Request Parameters:
+
+scheduleid: ID of the schedule to retrieve (String)
+date: Date of the schedule(s) (String)
+status: Status of the schedule(s) (String)
+duration: Duration of the schedule(s) (String)
+start_time: Start time of the schedule(s) (String)
+Request Headers:
+
+Authorization: Bearer your_jwt_token_here
+Success Response:
+Status Code: 200
+Response Body: Array of schedule objects
+
+Error Responses:
+
+If there's an error during fetching:
+Status Code: 500
+Response Body: Error message
+
+---
 
 ## Members
+
+---
+
+PUT /fitnessGoals/updateFitnessGoal
+
+Description:
+Updates the details of a fitness goal by a member.
+
+Request Body:
+
+memberid: ID of the member (String)
+goalid: ID of the fitness goal to be updated (String)
+status: Updated status of the fitness goal (String)
+completeDate: Date when the goal was completed (String)
+Request Headers:
+
+Authorization: Bearer your_jwt_token_here
+Success Response:
+Status Code: 200
+Response Body: "Fitness goal updated successfully"
+
+Error Responses:
+
+If unauthorized:
+Status Code: 401
+Response Body: "Unauthorized access"
+If there's an error during updating:
+Status Code: 500
+Response Body: Error message
+
+---
+
+POST /fitnessGoals/addFitnessGoal
+
+Description:
+Adds a new fitness goal for a member.
+
+Request Body:
+
+memberid: ID of the member (String)
+goal_title: Title of the fitness goal (String)
+goal_description: Description of the fitness goal (String)
+goal_value: Value/Measurement of the fitness goal (String)
+target_date: Target completion date of the fitness goal (String)
+Request Headers:
+
+Authorization: Bearer your_jwt_token_here
+Success Response:
+Status Code: 200
+Response Body: "Fitness goal added successfully"
+
+Error Responses:
+
+If unauthorized:
+Status Code: 401
+Response Body: "Unauthorized access"
+If there's an error during adding:
+Status Code: 500
+Response Body: Error message
+
+---
 
 GET /members/getFitnessGoals/:status
 
@@ -364,6 +605,34 @@ GET /members/getHealthMetrics
 
 ---
 
+PUT /healthMetrics/updateHealthMetrics
+
+Description:
+Updates the health metrics (height and weight) of a member.
+
+Request Body:
+
+memberid: ID of the member (String)
+height: Updated height of the member (String)
+weight: Updated weight of the member (String)
+Request Headers:
+
+Authorization: Bearer your_jwt_token_here
+Success Response:
+Status Code: 200
+Response Body: "Health metrics updated successfully"
+
+Error Responses:
+
+If unauthorized:
+Status Code: 401
+Response Body: "Unauthorized access"
+If there's an error during updating:
+Status Code: 500
+Response Body: Error message
+
+---
+
 GET /members/getWeeklyRoutines
 
 	Description:
@@ -385,6 +654,26 @@ GET /members/getWeeklyRoutines
 
 		Status Code: 500 Internal Server Error
 		Response Body: "An error occurred while fetching weekly routines"
+
+---
+
+GET /exercises/getExercises
+
+Description:
+Retrieves a list of exercises available in the system.
+
+Request Headers:
+
+Authorization: Bearer your_jwt_token_here
+Success Response:
+Status Code: 200
+Response Body: Array of exercise objects
+
+Error Responses:
+
+If there's an error during fetching:
+Status Code: 500
+Response Body: "An error occurred while fetching exercises"
 
 ---
 
@@ -494,6 +783,34 @@ GET /members/getMemberInvoice
 
 		Status Code: 500 Internal Server Error
 		Response Body: "An error occurred while fetching invoices"
+
+
+---
+POST /classes/bookGroupClass
+
+Description:
+Books a group class for a member.
+
+Request Headers:
+
+Authorization: Bearer your_jwt_token_here
+Request Body:
+
+memberid: ID of the member booking the class (String)
+scheduleid: ID of the schedule for the group class (String)
+Success Response:
+Status Code: 200
+Response Body: "Group class booked successfully"
+
+Error Responses:
+
+If the user is not authorized to book the group class:
+Status Code: 401
+Response Body: "Unauthorized access"
+If there's an error during booking:
+Status Code: 500
+Response Body: "Error booking group class! Class already booked?"
+
 
 ---
 
@@ -663,6 +980,28 @@ PUT /trainers/updateAvailability
 		Status Code: 500 Internal Server Error
 		Response Body: "An error occurred while updating availability"
 
+---
+
+GET /trainers/getTrainerDetails
+
+Description:
+Retrieves details of a specific trainer.
+
+Request Headers:
+
+Authorization: Bearer your_jwt_token_here
+Query Parameters:
+
+trainerid: ID of the trainer (String)
+Success Response:
+Status Code: 200
+Response Body: Trainer details object
+
+Error Responses:
+
+If there's an error during fetching:
+Status Code: 500
+Response Body: "An error occurred while fetching trainer details"
 
 ## Admin
 
@@ -708,6 +1047,33 @@ GET /admin/getAllEquipments
 
 		Status Code: 500 Internal Server Error
 		Response Body: "An error occurred while fetching equipments"
+
+---
+
+PUT /equipment/updateEquipmentStatus
+
+Description:
+Updates the status of a specific equipment.
+
+Request Headers:
+
+Authorization: Bearer your_jwt_token_here
+Request Body:
+
+equipmentid: ID of the equipment (String)
+status: New status of the equipment (String)
+Success Response:
+Status Code: 200
+Response Body: "Equipment status updated successfully"
+
+Error Responses:
+
+If the user is not authorized:
+Status Code: 401
+Response Body: "Unauthorized access"
+If there's an error during the update:
+Status Code: 500
+Response Body: "An error occurred while updating equipment status"
 
 ---
 
@@ -779,3 +1145,62 @@ PUT /admin/updateEquipmentStatus
 
 		Status Code: 500 Internal Server Error
 		Response Body: "An error occurred while updating equipment status"
+
+---
+PUT /rooms/updateRoomStatus
+
+Description:
+Updates the status of a specific room.
+
+Request Headers:
+
+Authorization: Bearer your_jwt_token_here
+Request Body:
+
+roomid: ID of the room (String)
+status: New status of the room (String)
+Success Response:
+Status Code: 200
+Response Body: "Room status updated successfully"
+
+Error Responses:
+
+If the user is not authorized:
+Status Code: 401
+Response Body: "Unauthorized access"
+If there's an error during the update:
+Status Code: 500
+Response Body: "An error occurred while updating room status"
+
+
+---
+
+POST /invoices/refundInvoice
+
+Description:
+Refunds the invoice associated with the provided invoice ID.
+
+Request Headers:
+
+Authorization: Bearer your_jwt_token_here
+Request Body:
+
+invoiceid: ID of the invoice to be refunded (String)
+Success Response:
+Status Code: 200
+Response Body: "Invoice refunded successfully"
+
+Error Responses:
+
+If the user is not authorized:
+Status Code: 401
+Response Body: "Unauthorized access"
+If the invoice is already refunded:
+Status Code: 400
+Response Body: "Invoice is already refunded"
+If the member hasn't canceled the schedule:
+Status Code: 400
+Response Body: "Member hasn't canceled the schedule, cannot refund invoice"
+If there's an error during the refund process:
+Status Code: 500
+Response Body: "An error occurred while refunding invoice"
