@@ -14,8 +14,8 @@ const metadata = { title: `Trainers | Dashboard | ${config.site.name}` } satisfi
 const axios = require('axios');
 
 export default function Page(): React.JSX.Element {
-  const [members, setMembers] = React.useState([]);
-  const [filteredMembers, setFileredMembers] = React.useState([]);
+  const [members, setMembers] = React.useState<any | null>([]);
+  const [filteredMembers, setFileredMembers] = React.useState<any | null>([]);
 
   const filterMembers = (queryName: string) => {
     const filteredMembers = members.filter((member: any) => {

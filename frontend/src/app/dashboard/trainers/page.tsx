@@ -14,9 +14,9 @@ const metadata = { title: `Trainers | Dashboard | ${config.site.name}` } satisfi
 const axios = require('axios');
 
 export default function Page(): React.JSX.Element {
-  const [trainers, setTrainers] = React.useState([]);
-  const [trainerAvails, setTrainerAvails] = React.useState({}); // [trainerid, [avail1, avail2, ...]
-  const [personalClasses, setPersonalClasses] = React.useState({});
+  const [trainers, setTrainers] = React.useState<any | null>([]);
+  const [trainerAvails, setTrainerAvails] = React.useState<any | null>({}); // [trainerid, [avail1, avail2, ...]
+  const [personalClasses, setPersonalClasses] = React.useState<any | null>({});
 
   
   const getPersonalClasses = async(trainerid: string) => {

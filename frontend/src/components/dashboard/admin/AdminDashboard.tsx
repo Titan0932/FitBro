@@ -6,7 +6,7 @@ const axios = require('axios');
 
 
 export const AdminDashboard = () => {
-    const [invoices, setInvoices] = React.useState([]);
+    const [invoices, setInvoices] = React.useState<any | null>([]);
 
     const getInvoiceHistory = async () => {
         const apiConfig = {

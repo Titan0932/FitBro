@@ -15,10 +15,25 @@ const metadata = { title: `My Schedule | Dashboard | ${config.site.name}` } sati
 
 const axios = require('axios');
 
+interface Schedule {
+  scheduleid: number;
+  className: string;
+  classDescription: string;
+  date: string;
+  start_time: string;
+  duration: number;
+  roomName: string;
+  trainerFname: string;
+  trainerLname: string;
+  paid: string;
+  status: string;
+  classType: string;
+}
+
 export default function Page(): React.JSX.Element {
-  const [schedule, setSchedule] = React.useState([]);
+  const [schedule, setSchedule] = React.useState<any | null>([]);
   const user = React.useContext(UserContext);
-  const [toDelete, setToDelete] = React.useState(null);
+  const [toDelete, setToDelete] = React.useState<Schedule | null>(null);
   const router = useRouter();
   
   const deleteSchedule = async () => {
@@ -122,7 +137,7 @@ export default function Page(): React.JSX.Element {
   );
 }
 
-const DeleteConfirmationModal = ({ deleteId, onClose, onConfirm } : { deleteId: number, onClose: () => void, onConfirm: () => void }) => {
+const DeleteConfirmationModal = ({ deleteId, onClose, onConfirm } : { deleteId: number|undefined, onClose: () => void, onConfirm: () => void }) => {
   return (
     <Dialog open={deleteId != null} onClose={onClose}>
       <DialogTitle>Confirm Deletion</DialogTitle>

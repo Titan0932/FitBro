@@ -70,7 +70,9 @@ export function AccountDetailsForm(): React.JSX.Element {
       alert("No changes made");
       return;
     }else{
-      await user?.updateUserInfo(values);
+      if (user !== undefined && typeof user?.updateUserInfo === 'function') {
+        await user.updateUserInfo(values);
+      }
       
       setIsPending(false);
       router.refresh();

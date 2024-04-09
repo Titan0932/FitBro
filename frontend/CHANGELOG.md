@@ -11,7 +11,6 @@
 - Replace `Hero Icons` with `Phosphor Icons`
 - Replace `pages` router with `app router`
 - Replace `Yup` with `Zod`
-- Update `eslint` rules
 - Update auth implementation
 - Update dependencies
 - Update design system
@@ -45,7 +44,6 @@
 
 ###### Aug 7, 2020
 
-- Add `eslint`
 - Add `Feather Icons`
 - Add `Formik` for login/register pages
 - Implement `react-router` v6 routing method

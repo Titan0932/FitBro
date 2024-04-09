@@ -26,10 +26,10 @@ const axios = require('axios');
 
 
 export const ExcerciseRoutines = () => {
-    const [myRoutine, setMyRoutine] = useState([]);
-    const [exerciseList, setExerciseList] = useState([]);
+    const [myRoutine, setMyRoutine] = useState<any|null>([]);
+    const [exerciseList, setExerciseList] = useState<any|null>([]);
     const user = React.useContext(UserContext);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState<any|null>(false);
 
     const getExcerciseList = async () => {
         let config = {
@@ -134,7 +134,7 @@ export const ExcerciseRoutines = () => {
 const ExerciseRoutineTable = ({ routineData }: {routineData: any}) => {
     return (
         <Grid container spacing={2}>
-            {routineData.map((item, index) => (
+            {routineData.map((item: any, index:number) => (
                 <Grid item xs={12} sm={6} key={index}>
                     <Card>
                         <CardContent>
@@ -180,10 +180,10 @@ const ExerciseOptionCard = ({ exercise, onClick, selectedExercise } : {exercise:
 
 
 const AddExerciseModal = ({ open, onClose, exerciseList, onAdd }: {open:boolean, onClose: () => void, exerciseList: any, onAdd: (exerciseData: any) => void}) => {
-    const [selectedExercise, setSelectedExercise] = useState('');
-    const [reps, setReps] = useState('');
-    const [weight, setWeight] = useState('');
-    const [startWeek, setStartWeek] = useState('1');
+    const [selectedExercise, setSelectedExercise] = useState<any|null>('');
+    const [reps, setReps] = useState<any|null>('');
+    const [weight, setWeight] = useState<any|null>('');
+    const [startWeek, setStartWeek] = useState<any|null>('1');
   
     const handleAddExercise = () => {
       // Validate input fields
@@ -212,7 +212,7 @@ const AddExerciseModal = ({ open, onClose, exerciseList, onAdd }: {open:boolean,
         <DialogTitle>Add Exercise</DialogTitle>
         <DialogContent>
             <Grid container spacing={2}>
-            {exerciseList.map((exercise) => (
+            {exerciseList.map((exercise: any) => (
                 <Grid item xs={12} sm={6} key={exercise.exerciseid}>
                 <ExerciseOptionCard onClick={() => setSelectedExercise(exercise.exerciseid)} exercise={exercise} selectedExercise={selectedExercise} />
                 </Grid>

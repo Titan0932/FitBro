@@ -26,10 +26,10 @@ interface onAddProps {
 }
 
 const AddFitnessGoalModal = ({ open, onClose, onAdd } : {open: boolean, onClose: () => void, onAdd: (newGoalData:onAddProps) => void}) => {
-  const [goalTitle, setGoalTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [goalValue, setGoalValue] = useState('');
-  const [targetDate, setTargetDate] = useState('');
+  const [goalTitle, setGoalTitle] = useState<any | null>('');
+  const [description, setDescription] = useState<any | null>('');
+  const [goalValue, setGoalValue] = useState<any | null>('');
+  const [targetDate, setTargetDate] = useState<any | null>('');
 
   const handleAddGoal = () => {
     // Validate input fields
@@ -111,8 +111,8 @@ const AddFitnessGoalModal = ({ open, onClose, onAdd } : {open: boolean, onClose:
 
 export const  FitnessGoals = () =>{
     const user = React.useContext(UserContext)
-    const [goals, setGoals] = React.useState([])
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [goals, setGoals] = React.useState<any | null>([])
+    const [isModalOpen, setIsModalOpen] = useState<any | null>(false);
 
     const handleModalOpen = () => {
         setIsModalOpen(true);
@@ -210,7 +210,7 @@ export const  FitnessGoals = () =>{
                 <Typography variant="h6" color="textSecondary">No fitness goals added yet. Click on the + icon to add a new goal.</Typography>
               :
               <Grid container spacing={2}>
-                  {goals.map((goal) => (
+                  {goals.map((goal:any) => (
                       <GoalCard key={goal.goalid} goal={goal} onStatusChange={handleStatusChange} />
                   ))}
               </Grid>
@@ -219,8 +219,8 @@ export const  FitnessGoals = () =>{
     );
 }
 
-const GoalCard = ({ goal, onStatusChange, key } : {goal: any, onStatusChange: (goalId: number, newStatus: string) => boolean, key: number}) => {
-    const [checked, setChecked] = React.useState(goal.status === 'completed');
+const GoalCard = ({ goal, onStatusChange, key } : {goal: any, onStatusChange: (goalId: number, newStatus: string) => any, key: number}) => {
+    const [checked, setChecked] = React.useState<any | null>(goal.status === 'completed');
   
     const handleChange = async () => {
       const newStatus = checked ? 'incomplete' : 'completed';

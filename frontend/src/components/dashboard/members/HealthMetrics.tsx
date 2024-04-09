@@ -7,8 +7,8 @@ import React, {useState, useEffect, useContext} from 'react'
 const axios = require('axios');
 
 export const HealthMetrics = () => {
-    const [weight, setWeight] = useState('');
-    const [height, setHeight] = useState('');
+    const [weight, setWeight] = useState<any | null>('');
+    const [height, setHeight] = useState<any | null>('');
     const user = useContext(UserContext);
     const router = useRouter();
     

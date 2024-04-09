@@ -52,11 +52,11 @@ const RoleMenu = ({updateRole, openMenu, redirect} : RoleMenuProps) => {
 
 
 export const RoleSelect = ({redirect = true}: {redirect?: boolean}) => {
-    const [openMenu, setOpenMenu] = useState(false)
+    const [openMenu, setOpenMenu] = useState<any | null>(false)
     const user = useContext(UserContext);
   
     const handleMenu = () => {
-        setOpenMenu( cur => !cur)
+        setOpenMenu( (cur:any) => !cur)
     }
 
     return(

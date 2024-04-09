@@ -14,7 +14,7 @@ const metadata = { title: `Rooms | Dashboard | ${config.site.name}` } satisfies 
 const axios = require('axios');
 
 export default function Page(): React.JSX.Element {
-  const [rooms, setRooms] = React.useState([]);
+  const [rooms, setRooms] = React.useState<any | null>([]);
 
   const onUpdateStatus = async (roomid: string, newStatus: string) => {
     let data = `roomid=${roomid}&status=${newStatus}`;

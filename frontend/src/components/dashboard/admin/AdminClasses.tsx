@@ -18,16 +18,22 @@ interface NewClass {
     type: string
 }
 
+interface ClassToDelete{
+    classid: number
+}
+
+
+
 export const AdminClasses = () => {
-    const [classes, setClasses] = React.useState([]);
-    const [trainers, setTrainers] = React.useState({});
-    const [classToDelete, setClassToDelete] = React.useState(null);
-    const [classTimes, setClassTimes] = React.useState([]);
-    const [createClassOpen, setCreateClassOpen] = React.useState(false);
-    const [selectedSlot, setSelectedSlot] = React.useState(null);
-    const [openEditModal, setOpenEditModal] = React.useState(false);
-    const [classScheduleToAdd, setClassScheduleToAdd] = React.useState(null);
-    const [availableRooms, setAvailableRooms] = React.useState([]);
+    const [classes, setClasses] = React.useState<any | null>([]);
+    const [trainers, setTrainers] = React.useState<any | null>({});
+    const [classToDelete, setClassToDelete] = React.useState<ClassToDelete | null>(null);
+    const [classTimes, setClassTimes] = React.useState<any | null>([]);
+    const [createClassOpen, setCreateClassOpen] = React.useState<boolean>(false);
+    const [selectedSlot, setSelectedSlot] = React.useState<any | null>(null);
+    const [openEditModal, setOpenEditModal] = React.useState<boolean>(false);
+    const [classScheduleToAdd, setClassScheduleToAdd] = React.useState<any | null>(null);
+    const [availableRooms, setAvailableRooms] = React.useState<any|null>([]);
 
     const closeEditModal = () => {
         setOpenEditModal(false);
@@ -231,7 +237,7 @@ export const AdminClasses = () => {
                 }
             }
             return true;
-        }catch(error){
+        }catch(error :any){
             console.log("Error: ", error);
             alert( "Error validating new schedule: " + (error?.response?.data ?? error.message))
             return false
@@ -239,7 +245,7 @@ export const AdminClasses = () => {
     }
 
     const updateClass = async (newStartDate:any, newStartTime:any, newDuration:any) => {
-        event.preventDefault();
+        event?.preventDefault();
         if(newDuration > 3 || newDuration < 1) {
             return alert("Duration should be between 1 and 3 hours!");
         }
@@ -273,7 +279,7 @@ export const AdminClasses = () => {
     }
 
     const addGroupSchedule = async(newStartDate:any, newStartTime:any, newDuration:any, room: any) => {
-        event.preventDefault();
+        event?.preventDefault();
         if(newDuration > 3 || newDuration < 1) {
             return alert("Duration should be between 1 and 3 hours!");
         }
@@ -443,7 +449,7 @@ const ClassModal = ({classToDelete, onClose, classTimes, deleteClass, updateClas
 }
 
 
-const AddClass = ({open, trainers, createClass, onClose} : {open: boolean, trainers: Record<number, Record<string, string>>, createClass: (newClass: NewClass) => void, onClose: () => void}) => {
+const AddClass = ({open, trainers, createClass, onClose} : {open: boolean, trainers: any, createClass: (newClass: NewClass) => void, onClose: () => void}) => {
     
     const [newClass, setNewClass] = React.useState<NewClass>({name: "", description: "", price: 0, trainer: {}, type: ""});
 
@@ -471,7 +477,7 @@ const AddClass = ({open, trainers, createClass, onClose} : {open: boolean, train
         })
     }
 
-    const setTrainer = (trainer: Record<string,string>) => {
+    const setTrainer = (trainer: any) => {
         setNewClass((prev) => {
             return {...prev, trainer: trainer}
         })
@@ -570,9 +576,9 @@ interface Trainer {
   }
 
 const EditClassModal = ({modalOpen, onClose, updateClass}: {modalOpen: boolean, onClose: () => void, updateClass: (newDate: any, newTime: any, newDuration:any) => void}) => {
-    const [selectedDate, setSelectedDate] = React.useState(null);
-    const [updatedStartTime, setUpdatedStartTime] = React.useState(null);
-    const [updatedDuration, setUpdatedDuration] = React.useState(null);
+    const [selectedDate, setSelectedDate] = React.useState<any|null>(null);
+    const [updatedStartTime, setUpdatedStartTime] = React.useState<any|null>(null);
+    const [updatedDuration, setUpdatedDuration] = React.useState<any|null>(null);
     const user = React.useContext(UserContext);
 
     return(
@@ -613,8 +619,6 @@ const EditClassModal = ({modalOpen, onClose, updateClass}: {modalOpen: boolean, 
                                 margin="dense"
                                 label="Duration"
                                 type="number"
-                                min={1}
-                                max={3}
                                 fullWidth
                                 InputLabelProps={{
                                     shrink: true,
@@ -639,10 +643,10 @@ const EditClassModal = ({modalOpen, onClose, updateClass}: {modalOpen: boolean, 
 
 
 const AddGroupScheduleModal = ({modalOpen, onClose, addGroupSchedule, availableRooms}: {modalOpen: boolean, onClose: () => void, addGroupSchedule: (newDate: any, newTime: any, newDuration:any, room:any) => void, availableRooms: any}) => {
-    const [selectedDate, setSelectedDate] = React.useState(null);
-    const [startTime, setStartTime] = React.useState(null);
-    const [duration, setDuration] = React.useState(null);
-    const [room, setRoom] = React.useState(null);
+    const [selectedDate, setSelectedDate] = React.useState<any|null>(null);
+    const [startTime, setStartTime] = React.useState<any|null>(null);
+    const [duration, setDuration] = React.useState<any|null>(null);
+    const [room, setRoom] = React.useState<any|null>(null);
     const user = React.useContext(UserContext);
 
     return(
@@ -683,8 +687,6 @@ const AddGroupScheduleModal = ({modalOpen, onClose, addGroupSchedule, availableR
                                 margin="dense"
                                 label="Duration"
                                 type="number"
-                                min={1}
-                                max={3}
                                 fullWidth
                                 InputLabelProps={{
                                     shrink: true,

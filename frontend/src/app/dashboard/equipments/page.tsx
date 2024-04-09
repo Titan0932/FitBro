@@ -14,7 +14,7 @@ const metadata = { title: `Equipments | Dashboard | ${config.site.name}` } satis
 const axios = require('axios');
 
 export default function Page(): React.JSX.Element {
-  const [equipments, setEquipments] = React.useState([]);
+  const [equipments, setEquipments] = React.useState<any | null>([]);
 
 
   const onUpdateStatus = async (equipmentId: string, newStatus: string) => {

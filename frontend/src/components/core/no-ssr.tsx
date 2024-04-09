@@ -13,7 +13,7 @@ export interface NoSsrProps {
 // without prop-types
 export function NoSsr(props: NoSsrProps): React.JSX.Element {
   const { children, defer = false, fallback = null } = props;
-  const [mountedState, setMountedState] = React.useState(false);
+  const [mountedState, setMountedState] = React.useState<any | null>(false);
 
   useEnhancedEffect((): void => {
     if (!defer) {

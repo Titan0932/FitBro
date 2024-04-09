@@ -58,7 +58,7 @@ export function TrainerTable({
   }, [rows]);
 
   const [selectedTrainer, setSelectedTrainer] = React.useState<Trainer | null>(null);
-  const [modalOpen, setModalOpen] = React.useState(false);
+  const [modalOpen, setModalOpen] = React.useState<any | null>(false);
   const user = React.useContext(UserContext);
 
   const handleRowClick = (trainer: Trainer) => {
@@ -113,7 +113,7 @@ export function TrainerTable({
         </Table>
       </Box>
       {/* <Divider /> */}
-      <TrainerModal modalOpen={modalOpen} handleCloseModal={handleCloseModal} selectedTrainer={selectedTrainer} availabilities={trainerAvails && trainerAvails[selectedTrainer?.trainerid]} personalClass={personalClasses[selectedTrainer?.trainerid]} /> 
+      <TrainerModal modalOpen={modalOpen} handleCloseModal={handleCloseModal} selectedTrainer={selectedTrainer} availabilities={trainerAvails && trainerAvails[selectedTrainer?.trainerid?? 0]} personalClass={personalClasses && personalClasses[selectedTrainer?.trainerid ?? 0]} /> 
     </Card>
   );
 }
@@ -122,15 +122,15 @@ interface TrainerModalProps {
   modalOpen: boolean;
   handleCloseModal: () => void;
   selectedTrainer: Trainer | null;
-  availabilities: Record<string, string[]>;
-  personalClass: Record<string, string>;
+  availabilities: any;
+  personalClass: any;
 }
 
 const TrainerModal = ({modalOpen, handleCloseModal, selectedTrainer, availabilities, personalClass}: TrainerModalProps) => {
-  const [selectedDate, setSelectedDate] = React.useState(null);
-  const [selectedTime, setSelectedTime] = React.useState(null);
-  const [freeTimes, setFreeTimes] = React.useState({}); // [start_time, end_time]
-  const [paymentModalOpen, setPaymentModalOpen] = React.useState(false);
+  const [selectedDate, setSelectedDate] = React.useState<any | null>(null);
+  const [selectedTime, setSelectedTime] = React.useState<any | null>(null);
+  const [freeTimes, setFreeTimes] = React.useState<any | null>({}); // [start_time, end_time]
+  const [paymentModalOpen, setPaymentModalOpen] = React.useState<any | null>(false);
 
   const handleDateClick = (date: any) => {
     (selectedDate == date)? 
@@ -194,14 +194,14 @@ const TrainerModal = ({modalOpen, handleCloseModal, selectedTrainer, availabilit
 
     console.log("filteredFreeTimeIntervals: ", filteredFreeTimeIntervals);
     setFreeTimes((prev: any) => {
-      return {...prev, [selectedTrainer.trainerid]: filteredFreeTimeIntervals}
+      return {...prev, [selectedTrainer?.trainerid ?? -1]: filteredFreeTimeIntervals}
     })
   };
 
 
   const getFreeTimes = async () => {
     if (selectedDate) {
-      let params = {trainerid: selectedTrainer.trainerid, date: selectedDate}
+      let params = {trainerid: selectedTrainer?.trainerid, date: selectedDate}
       let apiConfig = {
         method: 'get',
         maxBodyLength: Infinity,

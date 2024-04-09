@@ -4,7 +4,7 @@ export interface User {
   l_name?: string;
   avatar?: string;
   email?: string;
-  use_dob?: string;
+  user_dob?: string;
   phoneno?: string;
   city?: string;
   state?: string;

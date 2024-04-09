@@ -37,8 +37,8 @@ const metadata = { title: `My Schedule | Dashboard | ${config.site.name}` } sati
 const axios = require('axios');
 
 export default function Page(): React.JSX.Element {
-  const [schedule, setSchedule] = React.useState([]);
-  const [availability, setAvailability] = React.useState([]);
+  const [schedule, setSchedule] = React.useState<any | null>([]);
+  const [availability, setAvailability] = React.useState<any | null>([]);
   const user = React.useContext(UserContext);
   const router = useRouter();
 
@@ -153,10 +153,10 @@ const TrainerSchedule = ({ schedule }: { schedule: never[] }) => {
 };
 
 const TrainerAvailability = ({ availability, getAvailability }: { availability: never[], getAvailability: () => {} }) => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState<any | null>(false);
   const user = React.useContext(UserContext);
   const router = useRouter();
-  const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = React.useState<any | null>({
     date: '',
     start_time: '',
     end_time: '',
@@ -164,7 +164,7 @@ const TrainerAvailability = ({ availability, getAvailability }: { availability: 
 
   const handleChange = (e:any) => {
     const { id, value } = e.target;
-    setFormData((prevState) => ({
+    setFormData((prevState:any) => ({
       ...prevState,
       [id]: value,
     }));
@@ -254,7 +254,7 @@ const TrainerAvailability = ({ availability, getAvailability }: { availability: 
           align="end"
         />
         <Grid container justifyContent="center" spacing={3}>
-          {availability.map((slot, index) => (
+          {availability.map((slot:any , index: number) => (
             <Grid key={index} item xs={12} sm={6} md={4}>
               <Paper elevation={3}>
                 {/* <CardHeader action={<IconButton aria-label="Delete Availability"><DeleteIcon style={{ fontSize: 24, color: 'red' }} /></IconButton>} /> */}

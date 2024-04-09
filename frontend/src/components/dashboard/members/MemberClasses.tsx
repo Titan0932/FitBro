@@ -9,12 +9,12 @@ const axios = require('axios');
 
 
 export const MemberClasses = () => {
-    const [classes, setClasses] = React.useState([]);
-    const [trainers, setTrainers] = React.useState({});
-    const [selectedClass, setSelectedClass] = React.useState(null);
-    const [classTimes, setClassTimes] = React.useState([]);
-    const [selectedTime, setSelectedTime] = React.useState(null);
-    const [paymentModalOpen, setPaymentModalOpen] = React.useState(false);
+    const [classes, setClasses] = React.useState<any | null>([]);
+    const [trainers, setTrainers] = React.useState<any | null>({});
+    const [selectedClass, setSelectedClass] = React.useState<any | null>(null);
+    const [classTimes, setClassTimes] = React.useState<any | null>([]);
+    const [selectedTime, setSelectedTime] = React.useState<any | null>(null);
+    const [paymentModalOpen, setPaymentModalOpen] = React.useState<any | null>(false);
 
 
     const getTrainerDetails = async(trainerid: string) => {
