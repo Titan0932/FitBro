@@ -40,7 +40,7 @@ const fitness_goals = pgTable('fitness_goals', {
   });
   
   const trainer_availability = pgTable('trainer_availability', {
-    availabilityid: serial('availabilityid').unique(),
+    availabilityid: serial('availabilityid').primaryKey(),
     trainerid: integer('trainerid').references(trainers.trainerid),
     date: date('date').notNull(),
     start_time: time('start_time').notNull(),
@@ -70,7 +70,6 @@ const fitness_goals = pgTable('fitness_goals', {
     equipmentid: serial('equipmentid').primaryKey(),
     name: text('name').notNull(),
     status: text('status').notNull(),
-    roomid: integer('roomid').references(rooms.roomid),
   });
   
   const schedules = pgTable('schedules', {

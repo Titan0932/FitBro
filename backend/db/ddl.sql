@@ -38,7 +38,7 @@ CREATE TABLE trainers(
 );
 
 CREATE TABLE trainer_availability (
-    availabilityId SERIAL UNIQUE,
+    availabilityId SERIAL PRIMARY KEY,
     trainerID INTEGER REFERENCES trainers(trainerID),
     date DATE Not NULL, -- specific date of availability
     start_time TIME Not NULL,
@@ -69,7 +69,6 @@ CREATE TABLE equipments(
     equipmentId SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     status TEXT NOT NULL,
-    roomID INTEGER REFERENCES rooms(roomID)
 );
 
 CREATE TABLE schedules(
