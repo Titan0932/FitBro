@@ -7,6 +7,9 @@
 - In Development Mode:
   - Loading the page or route for the first time might be slow. But after the initial render, things will be much faster. This is because of Next.js rendering in local mode and also server-side rendering.
 
+- Sometimes you might see some minor/weird bugs in edge cases. These bugs would most definitely be frontend issues so please pay no heed to them! _/\_
+  - In an edge case bug, the backend server might crash if I somehow missed the error handling, please simply rerun the backend in this case!!
+
 - This is a fairly big project so lotta instructions coming down! Thank you for your patience! :)
 
 ## Compilation & Run Instructions
