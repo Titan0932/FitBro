@@ -76,3 +76,10 @@
 
 - **ER Diagram:**
   - `./ER.vpd.png`.
+
+
+- **Relational Diagram:**
+  - `./relational_schema.jpg`
+
+- **Project Report**
+  - `./CMOP3005_Final_Project.pdf`
