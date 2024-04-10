@@ -267,7 +267,7 @@ router.post("/payBill", async (req, res) => {
           await db
             .update(invoices)
             .set({ status: "paid" })
-            .where({ memberid, scheduleid })
+            .where(and(eq(invoices.memberid, memberid) , (invoices.scheduleid, scheduleid)) )
             .execute();
         }
       } else {
@@ -286,6 +286,7 @@ router.post("/payBill", async (req, res) => {
     }catch(err){
       console.log(err);
       res.status(500).send("An error occurred while paying bill");
+      return;
     }
 
     // Update schedule status to "CONFIRMED"
