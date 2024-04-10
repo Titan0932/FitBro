@@ -73,7 +73,7 @@ export function TrainerTable({
 
   return (
     <Card>
-      <CardHeader title="Trainers" />
+      <CardHeader title="Trainers -- Click to book personal class!" />
       <Divider />
       <Box sx={{ overflowX: 'auto' }}>
         <Table sx={{ minWidth: '800px' }}>
