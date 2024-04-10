@@ -1,40 +1,54 @@
-## IMPORTANT NOTES
+## Important Notes
 
-- If there's ever weird behavior: error alerts/ content not loading, refresh the page. WHen the auth token expires, the api doesnt give data. I didnt implement the redirect to signin when you change routes. Only when you refresh, it is checked.
+- If there's ever weird behavior like error alerts or content not loading, try refreshing the page. When the auth token expires, the API doesn't provide data. I didn't implement the redirect to signin when you change routes. It only happens when you refresh the page.
 
-- Building for the first time is kinda slow. Pls be patient!! :)
+- Building for the first time may be slow. Please be patient!
 
-- IN DEV MODE: 
-    If loading the page/route for the first time it might be a little slow to load. But after initial render, things will be much faster. This is because of Next.js rendering in local mode and also serverside rendering.
+- In Development Mode:
+  - Loading the page or route for the first time might be slow. But after the initial render, things will be much faster. This is because of Next.js rendering in local mode and also server-side rendering.
 
+## Compilation & Run Instructions
 
-## Compilation & Run instructions
+### Backend:
+1. **Run the Backend first:**
+   - Open terminal and navigate to `/backend`.
+   - Run `npm install` to install dependencies.
+   - Run `node server.js`.
 
-    - Run the Backend first:
-        - open terminal and navigate to /backend.
-        - run `npm install`  -- install dependencies
-        - run ` node server.js `
+### Frontend:
+2. **Run Frontend:**
+   - Navigate to `/frontend` in the terminal.
+   - Run `npm install` to install dependencies.
+   - Run `npm run build`. This will take some time but only needs to be run ONCE.
+   - Run `npm start`. Once you have built, you can simply run this. No need to rebuild over and over.
 
-    - Run frontend:
-        - Navigate to /frontend in the terminal.
-        - run `npm install`  -- install dependencies
-        - run ` npm run build`   -- This will take some time but only needs to be run ONCE
-        - run ` npm start`          -- Once you have build, you can simply run this. No need to rebuild over and over.
+   #### If Build Fails:
+   - Run `npm run dev`. This will be much slower but will run the application in dev mode!
 
-        # if build fails:
-            - run `npm run dev`    -- This will be much slower but will run the application in dev mode!
+### Login Info:
+- To test out different functionalities, I have loaded user information already.
+  - For member login:
+    - Email: johndoe@test.com
+    - Password: password
+  - For trainer login:
+    - Email: jasonThompson@test.com
+    - Password: password2
+  - For admin login:
+    - Email: margieThatcher@test.com
+    - Password: password3
 
+  - To make things easier, you may consider signing up as both member and admin using Jason Thompson's account and just switch between roles to test combinations of different things.
 
-## File info
+## File Info
 
-    - DDL and DML files + ORM schema:
-        - in ./backend/db
-    
-    - Test file:
-        - ./backend/test.js  -- THis has the SQL code to completely drop and remake the postgres db schema. Run in PGadmin
+- **DDL and DML files + ORM schema:**
+  - Located in `./backend/db`.
 
-    - The backend APIS:
-        - ./backend/routes -- Routes are divided according to files. Check server.js for how they are defined in the app.
+- **Test File:**
+  - `./backend/test.js`. This contains the SQL code to completely drop and remake the PostgreSQL database schema. Run in PGadmin.
 
-    - ER diagram:
-        - ./ER.vpd.png
+- **Backend APIs:**
+  - Located in `./backend/routes`. Routes are divided according to files. Check `server.js` for how they are defined in the app.
+
+- **ER Diagram:**
+  - `./ER.vpd.png`.
